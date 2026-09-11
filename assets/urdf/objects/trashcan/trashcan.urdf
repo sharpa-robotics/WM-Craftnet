@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="object">
+  <link name="object">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
+      <geometry>
+        <mesh filename="meshes/trashcan.stl" scale="0.03 0.03 0.03"/>
+      </geometry>
+      <material name="mat">
+        <color rgba="0.46 0.58 0.62 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5707963 0 0"/>
+      <geometry>
+        <mesh filename="meshes/trashcan.stl" scale="0.03 0.03 0.03"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

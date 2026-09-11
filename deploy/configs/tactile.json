@@ -1,0 +1,29 @@
+{
+  "config_dir": "",
+  "left": {
+    "model_path": {},
+    "allowed_pack_loss": 0,
+    "buffer_size": 2,
+    "batch_size": 5,
+    "num_worker": 8,
+    "fps": 30,
+    "infer_from_device": true,
+    "require_jpeg": true,
+    "decode_jpeg": true,
+    "update_firmware": false,
+    "use_dist_force_model": true
+  },
+  "right": {
+    "model_path": {},
+    "allowed_pack_loss": 0,
+    "buffer_size": 2,
+    "batch_size": 5,
+    "num_worker": 8,
+    "fps": 30,
+    "infer_from_device": true,
+    "require_jpeg": true,
+    "decode_jpeg": true,
+    "update_firmware": false,
+    "use_dist_force_model": true
+  }
+}

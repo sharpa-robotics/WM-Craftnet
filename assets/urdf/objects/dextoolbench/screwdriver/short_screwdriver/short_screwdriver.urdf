@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot name="short_screwdriver_y_axis">
+  <link name="short_screwdriver">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 1.5707963"/>
+      <geometry>
+        <mesh filename="short_screwdriver.obj" scale="0.8 1.2 1.2"/>
+      </geometry>
+      <material name="yellow_handle">
+        <color rgba="0.62 0.52 0.34 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 1.5707963"/>
+      <geometry>
+        <mesh filename="short_screwdriver.obj" scale="0.8 1.2 1.2"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <density value="400.0"/>
+    </inertial>
+  </link>
+</robot>

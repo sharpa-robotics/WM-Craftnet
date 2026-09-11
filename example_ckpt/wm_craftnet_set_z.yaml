@@ -1,0 +1,674 @@
+task:
+  name: RealmanSharpaHa4CameraRotation
+  physics_engine: ${..physics_engine}
+  env:
+    handInitPoses:
+      default:
+        right_thumb_CMC_FE: 59.0
+        right_thumb_CMC_AA: -20.9
+        right_thumb_MCP_FE: 44.4
+        right_thumb_MCP_AA: -20.1
+        right_thumb_IP: 67.9
+        right_index_MCP_FE: 32.1
+        right_index_MCP_AA: -20.6
+        right_index_PIP: 92.5
+        right_index_DIP: 48.3
+        right_middle_MCP_FE: 4.7
+        right_middle_MCP_AA: -11.9
+        right_middle_PIP: 75.3
+        right_middle_DIP: 72.7
+        right_ring_MCP_FE: -0.7
+        right_ring_MCP_AA: 10.8
+        right_ring_PIP: 75.2
+        right_ring_DIP: 57.6
+        right_pinky_CMC: 1.3
+        right_pinky_MCP_FE: 34.8
+        right_pinky_MCP_AA: 20.2
+        right_pinky_PIP: 94.2
+        right_pinky_DIP: 64.9
+      improved:
+        right_thumb_CMC_FE: 26.0
+        right_thumb_CMC_AA: -13.3
+        right_thumb_MCP_FE: 65.5
+        right_thumb_MCP_AA: 10.2
+        right_thumb_IP: 52.8
+        right_index_MCP_FE: 5.4
+        right_index_MCP_AA: -8.4
+        right_index_PIP: 65.4
+        right_index_DIP: 59.1
+        right_middle_MCP_FE: 3.5
+        right_middle_MCP_AA: 0.8
+        right_middle_PIP: 73.9
+        right_middle_DIP: 38.8
+        right_ring_MCP_FE: -2.3
+        right_ring_MCP_AA: 10.5
+        right_ring_PIP: 66.6
+        right_ring_DIP: 64.4
+        right_pinky_CMC: 0.9
+        right_pinky_MCP_FE: 64.0
+        right_pinky_MCP_AA: 15.8
+        right_pinky_PIP: 96.9
+        right_pinky_DIP: 77.0
+      y:
+        right_thumb_CMC_FE: 49.4
+        right_thumb_CMC_AA: -9.9
+        right_thumb_MCP_FE: 70.9
+        right_thumb_MCP_AA: -0.6
+        right_thumb_IP: 77.9
+        right_index_MCP_FE: 7.2
+        right_index_MCP_AA: -10.5
+        right_index_PIP: 47.9
+        right_index_DIP: 75.0
+        right_middle_MCP_FE: 2.1
+        right_middle_MCP_AA: -0.5
+        right_middle_PIP: 41.2
+        right_middle_DIP: 46.5
+        right_ring_MCP_FE: -2.8
+        right_ring_MCP_AA: 1.7
+        right_ring_PIP: 37.9
+        right_ring_DIP: 51.7
+        right_pinky_CMC: 3.2
+        right_pinky_MCP_FE: -1.4
+        right_pinky_MCP_AA: 10.5
+        right_pinky_PIP: 54.7
+        right_pinky_DIP: 71.8
+      x:
+        right_thumb_CMC_FE: 46.6
+        right_thumb_CMC_AA: -9.3
+        right_thumb_MCP_FE: 43.3
+        right_thumb_MCP_AA: 20.0
+        right_thumb_IP: 48.6
+        right_index_MCP_FE: 4.9
+        right_index_MCP_AA: -12.8
+        right_index_PIP: 35.9
+        right_index_DIP: 75.4
+        right_middle_MCP_FE: 2.1
+        right_middle_MCP_AA: -0.5
+        right_middle_PIP: 41.3
+        right_middle_DIP: 46.5
+        right_ring_MCP_FE: -2.8
+        right_ring_MCP_AA: 1.7
+        right_ring_PIP: 37.9
+        right_ring_DIP: 51.7
+        right_pinky_CMC: 3.2
+        right_pinky_MCP_FE: -1.0
+        right_pinky_MCP_AA: 10.1
+        right_pinky_PIP: 70.9
+        right_pinky_DIP: 69.0
+    objSet: set_z
+    axis: z
+    controlMode: relative
+    numEnvs: ${train.params.tuning.num_envs}
+    episodeLength: 500
+    sensor: thick
+    armDofNum: 0
+    numActions: 22
+    robotAssetFile: urdf/right_sharpa_wave/right_sharpa_wave.urdf
+    objInitPosShift:
+    - -0.06
+    - 0.0075
+    - 0.045
+    resetPositionNoise:
+    - 0.03
+    - 0.015
+    - 0.001
+    resetRotationNoise: 5.0
+    frictionRandomization:
+      scale_range:
+      - 0.5
+      - 2.0
+      object_base: 0.2
+      hand_metal_base: 0.4
+      hand_elastomer_base: 1.2
+      elastomer_links:
+      - right_thumb_elastomer
+      - right_index_elastomer
+      - right_middle_elastomer
+      - right_ring_elastomer
+      - right_pinky_elastomer
+    pdRandomization:
+      enabled: true
+      scale_range:
+      - 0.8
+      - 1.2
+      min_gain: 1.0e-06
+    spin_coef: 1.0
+    reward_max_spin_rate: 2.0
+    vel_coef: -0.1
+    contact_coef: 0.0
+    tipForcePenaltyCoef: 0.9
+    tipForcePenaltyThresh: 2.0
+    tipForcePenaltyExpAlpha: 0.01
+    palm_root_contact_coef: 0.0
+    thumbNonTipContactPenalty: 0.1
+    thumbNonTipContactForceThresh: 1.0
+    thumbNonTipContactLinks:
+    - right_thumb_CMC_VL
+    - right_thumb_MC
+    - right_thumb_MCP_VL
+    - right_thumb_PP
+    - right_thumb_DP
+    torque_coef: -0.003
+    work_coef: -0.003
+    actionPenaltyScale: -0.002
+    controlPenaltyScale: -1.0
+    finger_coef: 0.1
+    distanceRewardDeadzone: 0.025
+    distanceRewardPenaltyWidth: 0.03
+    handPoseNonThumbScale: 1.0
+    handPoseCoef: 1.5
+    axisDevPenaltyCoef: 0.001
+    objInitPosDeviationCoef: 100.0
+    noSpinAngVelThresh: 0.5
+    noSpinMaxSteps: 60
+    noSpinResetPenalty: -50.0
+    inProcessPerturbation:
+      enabled: false
+      intervalControlSteps: 100
+      direction:
+      - 1.0
+      - 0.2
+      - 0.0
+      distance: 0.02
+    gravityCurriculum:
+      enabled: true
+      startMaxAngleDeg: 1.0
+      angleStepDeg: 0.05
+      maxAngleDeg: 4.0
+      fullRunRatioThreshold: 0.85
+      windowEpisodes: 2048
+      actionScaleStart: 1
+      actionScaleStep: 0.01
+      actionScaleMax: 1
+    handInit: improved
+    envSpacing: 0.75
+    enableDebugVis: false
+    aggregateMode: 1
+    TacThresh: 0.3
+    tacThreshRand: 0.05
+    sensorNoise: 0.02
+    disableTacObs: false
+    obs_stack: 4
+    includeTargetInObs: true
+    latency: 0.02
+    cameraPolicy:
+      enabled: true
+      mode: depth
+      save_image: false
+      save_image_interval: 5
+      save_image_dir: outputs/ha4_camera
+      max_depth: 0.4
+      depth_preprocess:
+        crop:
+          enabled: false
+          top_px: 20
+          bottom_px: 8
+          left_px: 9
+          right_px: 15
+        noise:
+          enabled: true
+          discontinuity_invalidate_enabled: false
+          discontinuity_thresh_m: 0.02
+          temporal_noise_enabled: true
+          temporal_noise_p_dropout: 0.01
+          temporal_noise_corr: 0.95
+          gaussian_noise_enabled: false
+          gaussian_noise_std: 0.005
+          random_rotation_enabled: true
+          random_rotation_deg: 0.3
+          gaussian_blur_enabled: false
+          gaussian_kernel: 5
+          gaussian_sigma: 1.0
+      marker_radius: 0.05
+      marker_segments: 24
+      marker_color:
+      - 1.0
+      - 0.0
+      - 0.0
+      viewer_env_id: 0
+      viewer_marker_enabled: false
+      viewer_marker_frustum_depth: 0.2
+      sensor:
+        pos:
+        - 0.1
+        - 0.03
+        - 1.1
+        rot:
+        - 90
+        - 30
+        - 180
+        width: 96
+        height: 72
+        fov: 79.2
+        position_jitter:
+        - 0.005
+        - 0.005
+        - 0.005
+        rotation_jitter_deg: 0.3
+      e2e:
+        enabled: false
+        feature_dim: 64
+        pose_pred: false
+        pos_loss_coef: 0.001
+        rot_loss_coef: 0.01
+        pose_pred_sequence:
+          seq_len: 8
+          pose_start_embed_dim: 32
+          tcn_channels:
+          - 64
+          - 128
+          - 128
+          tcn_kernel_size: 3
+          tcn_dropout: 0.1
+          head_hidden:
+          - 128
+        enable_tac_pred: false
+        tac_pred_loss_coef: 0.001
+        tac_pred_links:
+        - right_thumb_elastomer
+        - right_index_elastomer
+        - right_middle_elastomer
+        - right_ring_elastomer
+        - right_pinky_elastomer
+        - right_index_MP
+        - right_middle_MP
+        - right_ring_MP
+        - right_pinky_MP
+        - right_thumb_PP
+        - right_index_PP
+        - right_middle_PP
+        - right_ring_PP
+        - right_pinky_PP
+        - right_thumb_MC
+        - right_hand_C_MC
+        - right_pinky_MC
+      worldModel:
+        enabled: true
+        wm_latent_dim: 32
+        wm_feature_hidden:
+        - 256
+        - 128
+        replay_capacity: 256
+        train_after_warmup_steps: 10000
+        train_steps_per_epoch: 10
+        batch_size: 16
+        batch_length: 32
+        resume_body_from: ''
+        dyn_deter: 512
+        dyn_stoch: 32
+        dyn_discrete: 32
+        model_lr: 0.0001
+        grad_clip: 1000
+        image_on_cpu: true
+        wm_pose_pred: false
+        wm_pose_pred_hidden:
+        - 256
+        - 128
+        wm_pos_loss_coef: 0.05
+        wm_rot_loss_coef: 0.5
+        wm_tac_pred: false
+        wm_tac_pred_hidden:
+        - 256
+        - 128
+        wm_tac_loss_coef: 1.0
+        wm_tac_target_thresh: 0.01
+        wm_tac_pos_ema_decay: 0.01
+        wm_tac_pos_weight_min: 1.0
+        wm_tac_pos_weight_max: 20.0
+        wm_tac_pos_eps: 0.0001
+        wm_tac_pos_rate_init: 0.41
+        wm_tac_pred_links:
+        - right_thumb_elastomer
+        - right_index_elastomer
+        - right_middle_elastomer
+        - right_ring_elastomer
+        - right_pinky_elastomer
+        - right_index_MP
+        - right_middle_MP
+        - right_ring_MP
+        - right_pinky_MP
+        - right_thumb_PP
+        - right_index_PP
+        - right_middle_PP
+        - right_ring_PP
+        - right_pinky_PP
+        - right_thumb_MC
+        - right_hand_C_MC
+        - right_pinky_MC
+        wm_value_pred: false
+        wm_value_pred_hidden:
+        - 256
+        - 128
+        wm_value_loss_coef: 100.0
+        wm_obj_pred: false
+        wm_obj_pred_hidden:
+        - 512
+        - 256
+        wm_obj_loss_coef: 100.0
+        wm_obj_bps_num_points: 64
+        wm_obj_bps_seed: 2026
+        wm_obj_bps_radius_m: 0.06
+        wm_obj_bps_target_scale: 100.0
+    lfd:
+      enabled: false
+      demo_dir: data/0512_15_h5_only/h5_pack
+      horizon: 3
+      joint_ref:
+        enabled: true
+        weight: 0.0
+        order: sharpa
+        swap_non_thumb_fe_aa: false
+      fingertips_ref:
+        enabled: false
+        weight: 0.1
+      angvel_ref:
+        enabled: false
+        weight: 0.0
+        repeat: 8
+      tactile_ref:
+        enabled: false
+        weight: 0.1
+        alpha: 5.0
+    m_low: 0.2
+    m_up: 0.4
+    force_debug: false
+    debugMoveObjectAway: false
+    debugMoveObjectAwayPos:
+    - 0.0
+    - 0.0
+    - 0.1
+    numTestEnvs: 16
+    test:
+      test_m_low: 0.1
+      test_m_up: 1.4
+    clipObservations: 5.0
+    clipActions: 1.0
+    relScale: 0.2
+    absScale: 0.8
+    actionsMovingAverage: 0.8
+    trainLimit:
+      global_scale: 0.9
+      unilateral_override_deg:
+        right_thumb_CMC_AA:
+          lower: -18
+          upper: 6
+        right_index_MCP_AA:
+          lower: -18
+          upper: 5
+        right_ring_MCP_AA:
+          lower: -3
+          upper: 16
+        right_pinky_MCP_AA:
+          lower: -1
+          upper: 16
+    controlFrequencyInv: 6
+    resetDofPosRandomInterval: 0.2
+    resetDofVelRandomInterval: 0.0
+    forceScale: 0.5
+    forceProbScalar: 0.25
+    forceDecay: 0.99
+    disableSet: 0
+    fallDistance: 0.06
+    fallPenalty: -50.0
+    asymmetric_observations: true
+    printNumSuccesses: false
+    maxConsecutiveSuccesses: 0
+    cameraDemo:
+      enabled: true
+      camera:
+        pos:
+        - -0.075
+        - -0.35
+        - 1.264
+        rot:
+        - 0.0
+        - -40.0
+        - 90.0
+        width: 1280
+        height: 1280
+        fov: 45
+        pose_noise_std: 0.0
+        lookat:
+          enabled: true
+          target_pos:
+          - -0.075
+          - 0.0
+          - 0.964
+      record:
+        root_dir: ''
+        fps: 10
+        bitrate: 8M
+        ffmpeg_exe: /usr/bin/ffmpeg
+        game_idx_base: 0
+        filename_prefix: ''
+      inference_video:
+        enabled: true
+    spinTrace:
+      enabled: true
+      envId: 0
+      outputDir: ''
+    evalMetrics:
+      enabled: true
+      outputSubdir: metrics
+      invalidEpisodeMaxSteps: 10
+    isTestRun: false
+  task:
+    randomize: true
+    randomization_params:
+      frequency: 1000
+      observations:
+        range:
+        - 0
+        - 0.05
+        range_correlated:
+        - 0
+        - 0.001
+        operation: additive
+        distribution: gaussian
+      actions:
+        range:
+        - 0.0
+        - 0.04
+        range_correlated:
+        - 0
+        - 0.015
+        operation: additive
+        distribution: gaussian
+      sim_params:
+        gravity:
+          range:
+          - 0
+          - 0.0
+          operation: additive
+          distribution: gaussian
+      actor_params:
+        hand:
+          color: false
+          dof_properties:
+            stiffness:
+              range:
+              - 0.75
+              - 1.5
+              operation: scaling
+              distribution: loguniform
+            lower:
+              range:
+              - 0
+              - 1.0e-05
+              operation: additive
+              distribution: gaussian
+            upper:
+              range:
+              - 0
+              - 1.0e-05
+              operation: additive
+              distribution: gaussian
+  sim:
+    dt: 0.01667
+    substeps: 2
+    up_axis: z
+    use_gpu_pipeline: ${eq:${...pipeline},"gpu"}
+    gravity:
+    - 0.0
+    - 0.0
+    - -9.81
+    physx:
+      num_threads: ${....num_threads}
+      solver_type: ${....solver_type}
+      use_gpu: ${contains:"cuda",${....sim_device}}
+      num_position_iterations: 8
+      num_velocity_iterations: 0
+      max_gpu_contact_pairs: 8388608
+      num_subscenes: ${....num_subscenes}
+      contact_offset: 0.002
+      rest_offset: 0.0
+      bounce_threshold_velocity: 0.2
+      max_depenetration_velocity: 100.0
+      default_buffer_size_multiplier: 5.0
+      contact_collection: 2
+train:
+  params:
+    seed: ${...seed}
+    tuning:
+      num_envs: 1024
+      minibatch_size: 4096
+    save_best_after: 100
+    periodic_eval:
+      enabled: true
+      interval: 1000
+    algo:
+      name: a2c_continuous
+    model:
+      name: continuous_a2c_logstd
+    network:
+      name: actor_critic
+      separate: false
+      pointnet: small
+      moe:
+        enabled: false
+        num_experts: 6
+        axis_obs_start: 49
+        axis_obs_dim: 3
+      space:
+        continuous:
+          mu_activation: None
+          sigma_activation: None
+          mu_init:
+            name: default
+          sigma_init:
+            name: const_initializer
+            val: 0
+          fixed_sigma: true
+      mlp:
+        units:
+        - 512
+        - 256
+        - 256
+        activation: elu
+        d2rl: false
+        initializer:
+          name: default
+        regularizer:
+          name: None
+    load_checkpoint: ${if:${...checkpoint},True,False}
+    load_path: ${...checkpoint}
+    config:
+      name: ${resolve_default:AllegroArmMOA,${....experiment}}
+      env_name: rlgpu
+      prefix: 2026-05-25_20-39-44_wm_525resume
+      user_prefix: 525resume
+      multi_gpu: ${....multi_gpu}
+      ppo: true
+      mixed_precision: false
+      normalize_input: true
+      normalize_value: true
+      value_bootstrap: true
+      num_actors: ${..tuning.num_envs}
+      reward_shaper:
+        scale_value: 0.01
+      normalize_advantage: true
+      gamma: 0.99
+      tau: 0.95
+      learning_rate: 0.0001
+      lr_schedule: adaptive
+      schedule_type: standard
+      kl_threshold: 0.02
+      score_to_win: 100000
+      max_epochs: ${resolve_default:20100,${....max_iterations}}
+      save_best_after: ${..save_best_after}
+      save_frequency: 5000
+      print_stats: true
+      grad_norm: 1.0
+      entropy_coef: 0.0
+      truncate_grads: true
+      e_clip: 0.2
+      horizon_length: 16
+      minibatch_size: ${..tuning.minibatch_size}
+      mini_epochs: 4
+      critic_coef: 5
+      clip_value: true
+      seq_length: 4
+      bptt_len: 16
+      bounds_loss_coef: 0.005
+      bc_loss_coef: 0.01
+      weight_decay: 0.0
+      player_collect: false
+      periodic_eval:
+        enabled: ${...periodic_eval.enabled}
+        interval: ${...periodic_eval.interval}
+      player:
+        deterministic: true
+        print_stats: true
+      central_value_config:
+        minibatch_size: ${...tuning.minibatch_size}
+        mini_epochs: 4
+        learning_rate: 0.0005
+        lr_schedule: adaptive
+        schedule_type: standard
+        kl_threshold: 0.016
+        clip_value: true
+        normalize_input: true
+        truncate_grads: true
+        network:
+          name: actor_critic
+          central_value: true
+          mlp:
+            units:
+            - 512
+            - 512
+            - 256
+            - 256
+            activation: elu
+            d2rl: false
+            initializer:
+              name: default
+            regularizer:
+              name: None
+task_name: ${task.name}
+experiment: ''
+num_envs: ''
+seed: 42
+torch_deterministic: false
+max_iterations: ''
+physics_engine: physx
+pipeline: gpu
+sim_device: cuda:0
+rl_device: cuda:0
+graphics_device_id: 0
+num_threads: 4
+solver_type: 1
+num_subscenes: 4
+test: false
+checkpoint: ''
+multi_gpu: false
+wandb_activate: false
+wandb_group: ''
+wandb_name: ${train.params.config.name}
+wandb_entity: ''
+wandb_project: isaacgymenvs
+capture_video: false
+capture_video_freq: 1464
+capture_video_len: 100
+force_render: true
+headless: true
+player_action_savepath: ./a.pth

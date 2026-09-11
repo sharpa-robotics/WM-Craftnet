@@ -1,0 +1,463 @@
+# Registered task name (selected by task=... in train.py)
+name: RealmanSharpaHa4CameraRotation
+
+# Physics backend type (inherited from the global config)
+physics_engine: ${..physics_engine}
+
+env:
+  # Object set ID (selects the training object set)
+  objSet: "set_z"
+  # Primary rotation axis: x/y/z/all
+  axis: "z"  
+  # Control mode: relative (incremental target) / absolute (absolute target)
+  controlMode: relative
+  # Number of parallel environments; source of truth: train.params.tuning.num_envs
+  numEnvs: ${train.params.tuning.num_envs}
+  # Maximum control steps per episode (resets on timeout)
+  episodeLength: 500
+
+  # Robot sensor/asset version identifier
+  sensor: "thick"
+  armDofNum: 0
+  numActions: 22
+  # Robot URDF asset path
+  robotAssetFile: "urdf/right_sharpa_wave/right_sharpa_wave.urdf"
+  # Initial object position offset (xyz relative to arm_hand_start_pose in world coordinates)
+  objInitPosShift: [-0.06, 0.0075, 0.045]
+  # Initial object position random half-range [ax, ay, az]; sampled as shift + U(-a, +a)
+  resetPositionNoise: [0.03, 0.015, 0.001]
+  resetRotationNoise: 5.0
+
+  frictionRandomization:
+    # Global random scale range r ~ U[a,b]
+    scale_range: [0.5, 2.0]
+    object_base: 0.2
+    hand_metal_base: 0.4
+    hand_elastomer_base: 1.2
+    elastomer_links:
+      - right_thumb_elastomer
+      - right_index_elastomer
+      - right_middle_elastomer
+      - right_ring_elastomer
+      - right_pinky_elastomer
+  pdRandomization:
+    # Independently randomize baseline hand-joint P/D gains multiplicatively
+    enabled: True
+    # Sample each joint in each environment independently, scale ~ U[a,b]
+    scale_range: [0.8, 1.2]
+    # Prevent control degradation from near-zero values
+    min_gain: 1.0e-6
+  # Common reward parameters
+  # Axial rotation reward coefficient (primary term)
+  spin_coef: 1.0
+  # Axial rotation increment reward clipping threshold (symmetric [-x, x])
+  reward_max_spin_rate: 2.0
+  # Object linear velocity reward/penalty coefficient
+  vel_coef: -0.1
+  # Tactile contact reward coefficient (based on binary contact count)
+  contact_coef: 0.0
+  # Excessive fingertip contact force penalty:
+  # tip_force = ||contact_force|| (N)
+  # excess = relu(tip_force - thresh)
+  # penalty = -coef * (exp(alpha * mean(excess_5tips)) - 1)
+  tipForcePenaltyCoef: 0.9
+  tipForcePenaltyThresh: 2.0
+  tipForcePenaltyExpAlpha: 0.01
+  # Palm-root contact penalty coefficient (applied after threshold detection)
+  palm_root_contact_coef: 0.0
+  # Thumb non-tip contact penalty: a fixed penalty triggers when any listed link exceeds the force threshold
+  thumbNonTipContactPenalty: 0.1
+  thumbNonTipContactForceThresh: 1.0
+  thumbNonTipContactLinks:
+    - right_thumb_CMC_VL
+    - right_thumb_MC
+    - right_thumb_MCP_VL
+    - right_thumb_PP
+    - right_thumb_DP
+  # Squared torque penalty coefficient
+  torque_coef: -0.003
+  # Mechanical power penalty coefficient (|tau|*|dq|)
+  work_coef: -0.003
+  # Squared action penalty coefficient
+  actionPenaltyScale: -0.002
+  # Control error penalty coefficient (target-qpos)
+  controlPenaltyScale: -1.0
+  # Fingertip distance term coefficient (currently the penalty magnitude)
+  finger_coef: 0.1
+  # Fingertip-to-object-center distance term: no penalty within 2.5 cm; quadratic beyond it, saturating at 1
+  distanceRewardDeadzone: 0.025
+  distanceRewardPenaltyWidth: 0.03
+  # Extra weight for preserving the initial pose of the four non-thumb fingers (applied to joint-square terms in hand_pose_delta_sq)
+  handPoseNonThumbScale: 1.0
+  # Hand-pose preservation reward coefficient (exp(-delta_sq))
+  handPoseCoef: 1.5
+  # Off-axis rotation penalty: -coef * spin_delta_offaxis^2
+  axisDevPenaltyCoef: 0.001
+  # Drift penalty relative to initial position: -coef * ||p - p0||^2
+  objInitPosDeviationCoef: 100.0
+  # No-rotation reset threshold and penalty
+  noSpinAngVelThresh: 0.5
+  noSpinMaxSteps: 60
+  noSpinResetPenalty: -50.0
+  # In-process perturbation: translate the object in a world-space direction at control-step intervals to test policy recovery.
+  inProcessPerturbation:
+    enabled: False
+    intervalControlSteps: 100
+    direction: [1.0, 0.2, 0.0]
+    distance: 0.02
+  # Gravity curriculum (false=fixed vertical gravity, true=random direction with curriculum)
+  gravityCurriculum:
+    # Enable the random gravity-direction curriculum
+    enabled: True
+    startMaxAngleDeg: 1.0
+    angleStepDeg: 0.05
+    maxAngleDeg: 4.0
+    fullRunRatioThreshold: 0.85
+    windowEpisodes: 2048
+    actionScaleStart: 1
+    actionScaleStep: 0.01
+    actionScaleMax: 1
+  # Initial hand-pose template (default / improved)
+  handInit: "improved"
+  # Parallel environment spacing (prevents mutual collisions)
+  envSpacing: 0.75
+  # Enable visual debug rendering
+  enableDebugVis: False
+  # Aggregation mode (PhysX aggregate)
+  aggregateMode: 1
+  # Base tactile contact threshold (shared by observations and rewards)
+  TacThresh: 0.3
+  # Tactile observation threshold randomization range (observation threshold = TacThresh + U[-tacThreshRand, tacThreshRand); reward/aux use the true TacThresh)
+  tacThreshRand: 0.05
+  # Random tactile dropout probability
+  sensorNoise: 0.02
+  # Disable finger tactile observations; contact rewards are controlled only by contact_coef
+  disableTacObs: False
+  # Number of stacked observation frames
+  obs_stack: 4
+  # Include the previous joint target in policy observations (when false, retain only joint state)
+  includeTargetInObs: True
+  # Tactile latency probability (contact persists from the previous frame)
+  latency: 0.02
+
+  # Policy observation camera (used as WorldModel input)
+  cameraPolicy:
+    enabled: True
+    # Vision mode: rgb/depth/rgbd
+    mode: depth
+    max_depth: 0.4
+    depth_preprocess:
+      # ── Crop (determines output resolution; independently toggled)
+      crop:
+        enabled: False
+        top_px: 20
+        bottom_px: 8
+        left_px: 9
+        right_px: 15
+      # ── Noise (independently toggled augmentations; does not affect output size)
+      noise:
+        enabled: True
+        # Depth-discontinuity removal: invalidate both pixels (max depth) when adjacent depth difference exceeds the threshold
+        discontinuity_invalidate_enabled: False
+        discontinuity_thresh_m: 0.02    # Depth-difference threshold for edge discontinuities (meters); lower values remove more aggressively
+        # Temporal defective-pixel noise: simulates random failed pixels persisting across frames on real cameras (dropout)
+        temporal_noise_enabled: True
+        temporal_noise_p_dropout: 0.01  # Probability of adding random failed pixels each step; higher values produce more noise
+        temporal_noise_corr: 0.95       # Probability that failed pixels persist across frames (temporal correlation); higher values persist longer
+        # Gaussian noise: add independent per-pixel Gaussian perturbations to normalized depth values
+        gaussian_noise_enabled: False
+        gaussian_noise_std: 0.005       # Gaussian noise standard deviation (normalized depth units); higher values increase depth jitter
+        # Random rotation augmentation: apply a small random affine rotation to simulate camera mounting misalignment
+        random_rotation_enabled: True
+        random_rotation_deg: 0.3        # Maximum rotation angle (degrees); sampled uniformly from [-deg, +deg]
+        # Gaussian blur: smooth the depth image by convolution (normally disabled because it loses edge detail)
+        gaussian_blur_enabled: False
+        gaussian_kernel: 5              # Blur kernel size (pixels; must be odd)
+        gaussian_sigma: 1.0             # Gaussian blur standard deviation (pixels)
+    sensor:
+      pos: [0.1, 0.03, 1.1] #right_hand_C_MC [z−0.995,  y,  −(x−0.036)]
+      rot: [90, 30, 180]
+      width: 96
+      height: 72
+      fov: 79.2
+      position_jitter: [0.005, 0.005, 0.005]
+      rotation_jitter_deg: 0.3
+
+    # ── WM-Craftnet World Synesthesia Model (WSM) encoder
+    # Run obs_step synchronously in the environment and inject deterministic h into obs_dict[obs][wm_feature].
+    # Training is driven by the PPO after-epoch hook (WorldModel._train + ring replay).
+    worldModel:
+      enabled: True
+      wm_latent_dim: 32
+      wm_feature_hidden: [256, 128]
+      replay_capacity: 256
+      train_after_warmup_steps: 10000
+      train_steps_per_epoch: 10
+      batch_size: 16
+      batch_length: 32
+      # Optional WM body initialization from an agent checkpoint. Unlike the
+      # top-level checkpoint resume, this loads only encoder/dynamics/native
+      # WSM heads and leaves PPO policy, auxiliary heads, and optimizers fresh.
+      resume_body_from: ""
+      dyn_deter: 512 # h
+      dyn_stoch: 32
+      dyn_discrete: 32 #z 32*32
+      model_lr: 1.0e-4
+      grad_clip: 1000
+      image_on_cpu: True
+      # ── WSM decoder reconstruction loss toggles
+      # Control training losses only; decoder modules remain for initialization from older checkpoints containing prop/depth decoders.
+      wm_prop_pred: True
+      wm_depth_pred: True
+      # ── WM auxiliary head: pose prediction (MLP on WM latent features; no sequence needed because the GRU contains history)
+      wm_pose_pred: True
+      wm_pose_pred_hidden: [256, 128]
+      # Target aux weighted losses around the native prop_loss scale.
+      # Pose pos/rot are logged separately in new runs; retune split after seeing those curves.
+      wm_pos_loss_coef: 0.05
+      wm_rot_loss_coef: 0.5
+      # ── WM auxiliary head: tactile contact prediction (MLP on WM latent features)
+      wm_tac_pred: True
+      wm_tac_pred_hidden: [256, 128]
+      wm_tac_loss_coef: 1.0
+      # WM sees depth, not contact force magnitude; use a lower target threshold
+      # than env TacThresh so any meaningful contact supervises the latent.
+      wm_tac_target_thresh: 0.01
+      wm_tac_pos_ema_decay: 0.01
+      wm_tac_pos_weight_min: 1.0
+      wm_tac_pos_weight_max: 20.0
+      wm_tac_pos_eps: 1.0e-4
+      # Initialize close to observed contact positives (0.01N gives ~0.41 on inspected traces)
+      # so early BCE pos_weight is not artificially inflated.
+      wm_tac_pos_rate_init: 0.41
+      wm_tac_pred_links:
+        - right_thumb_elastomer
+        - right_index_elastomer
+        - right_middle_elastomer
+        - right_ring_elastomer
+        - right_pinky_elastomer
+        - right_index_MP
+        - right_middle_MP
+        - right_ring_MP
+        - right_pinky_MP
+        - right_thumb_PP
+        - right_index_PP
+        - right_middle_PP
+        - right_ring_PP
+        - right_pinky_PP
+        - right_thumb_MC
+        - right_hand_C_MC
+        - right_pinky_MC
+      # ── WM auxiliary head: critic value prediction (MLP on WM latent features)
+      wm_value_pred: True
+      wm_value_pred_hidden: [256, 128]
+      wm_value_loss_coef: 100.0
+      # ── WM auxiliary head: object shape prediction (BPS displacement vector regression)
+      wm_obj_pred: True
+      wm_obj_pred_hidden: [512, 256]
+      wm_obj_loss_coef: 100.0
+      # BPS displacement target: num_points * 3. Basis is sampled inside a
+      # radius-8cm ball in mesh coordinates; target_scale=100 converts m to cm.
+      wm_obj_bps_num_points: 64
+      wm_obj_bps_seed: 2026
+      wm_obj_bps_radius_m: 0.06
+      wm_obj_bps_target_scale: 100.0
+
+  # Lower bound for randomized object mass during training (kg)
+  m_low: 0.2
+  # Upper bound for randomized object mass during training (kg)
+  m_up: 0.4
+  # Number of parallel environments in test mode
+  numTestEnvs: 16
+  # Test mode parameters
+  test:
+    # Lower object-mass bound during testing (not currently used independently)
+    test_m_low: 0.1
+    # Upper object-mass bound during testing (not currently used independently)
+    test_m_up: 1.4
+
+  # Observation clipping limit
+  clipObservations: 5.0
+  # Action clipping limit
+  clipActions: 1.0
+  relScale: 0.2
+  absScale: 0.8
+  # Action EMA smoothing coefficient
+  actionsMovingAverage: 0.8
+  # Training joint-limit constraints
+  trainLimit:
+    # Global limit scale
+    global_scale: 0.9
+    # Unilateral limit overrides for specified joints (degrees)
+    unilateral_override_deg:
+      right_thumb_CMC_AA:
+        lower: -18
+        upper: 6
+      right_index_MCP_AA:
+        lower: -18
+        upper: 5
+      right_ring_MCP_AA:
+        lower: -3
+        upper: 16
+      right_pinky_MCP_AA:
+        lower: -1
+        upper: 16
+  # Control downsampling: number of simulation steps per action
+  controlFrequencyInv: 6
+
+  resetDofPosRandomInterval: 0.2
+  resetDofVelRandomInterval: 0.0
+
+  # Random external-force injection magnitude
+  forceScale: 0.5
+  # External-force injection probability per control step
+  forceProbScalar: 0.25
+  # Discrete external-force decay coefficient (applied once per control step)
+  forceDecay: 0.99
+  # Tactile-disable preset ID (0 means none disabled)
+  disableSet: 0
+
+  # Drop-detection distance threshold
+  fallDistance: 0.06
+  # Drop penalty
+  fallPenalty: -50.0
+
+  # Enable asymmetric critic observations
+  asymmetric_observations: True
+  # Print success statistics
+  printNumSuccesses: False
+  # Consecutive-success limit (resets when reached if >0)
+  maxConsecutiveSuccesses: 0
+
+
+
+  # Demo recording camera (excluded from observations)
+  cameraDemo:
+    enabled: True
+    camera:
+      pos: [-0.075, -0.35, 1.264]
+      rot: [0.0, -40.0, 90.0]
+      width: 1280
+      height: 1280
+      fov: 45
+      pose_noise_std: 0.0
+      lookat:
+        enabled: True
+        target_pos: [-0.075, 0.0, 0.964]
+    record:
+      root_dir: outputs/wm_craftnet_videos
+      fps: 10
+      bitrate: 8M
+      ffmpeg_exe: /usr/bin/ffmpeg
+      game_idx_base: 0
+      filename_prefix: ""
+    inference_video:
+      enabled: True
+  # Record the WorldModel posterior depth reconstruction and its corresponding
+  # clean ground-truth target alongside demo.mp4 during evaluation.
+  wmDepthVideoRecord:
+    enabled: True
+  spinTrace:
+    enabled: True
+    envId: 0
+    outputDir: ""
+
+  # Evaluation/test metrics (named consistently with demo_game_<idx>.mp4)
+  evalMetrics:
+    enabled: True
+    # Output subdirectory: <record_root>/<outputSubdir>/
+    outputSubdir: metrics
+    # Initial interpenetration ejection filter: episodes shorter than this threshold and terminated by a fall are invalid and excluded from statistics
+    invalidEpisodeMaxSteps: 10
+
+task:
+  randomize: True
+  randomization_params:
+    # Domain randomization frequency (control steps)
+    frequency: 1000
+    # Observation noise randomization
+    observations:
+      # Primary distribution parameter range
+      range: [0, .05]
+      # Correlated noise range
+      range_correlated: [0, .001]
+      # Operation type: additive/scaling
+      operation: "additive"
+      # Distribution type
+      distribution: "gaussian"
+    # Action noise randomization
+    actions:
+      range: [0., .04]
+      range_correlated: [0, .015]
+      operation: "additive"
+      distribution: "gaussian"
+    # Simulation parameter randomization
+    sim_params:
+      # Gravity randomization (the current zero range disables it)
+      gravity:
+        range: [0, 0.0]
+        operation: "additive"
+        distribution: "gaussian"
+    # Actor parameter randomization
+    actor_params:
+      # Hand actor randomization
+      hand:
+        # Randomize color (currently disabled)
+        color: False
+        # Joint property randomization
+        dof_properties:
+          # Stiffness randomization
+          stiffness:
+            range: [0.75, 1.5]
+            operation: "scaling"
+            distribution: "loguniform"
+          # Lower-limit perturbation
+          lower:
+            range: [0, 0.00001]
+            operation: "additive"
+            distribution: "gaussian"
+          # Upper-limit perturbation
+          upper:
+            range: [0, 0.00001]
+            operation: "additive"
+            distribution: "gaussian"
+
+sim:
+  # Simulation time step (seconds)
+  dt: 0.01667
+  # Substeps per simulation step
+  substeps: 2
+  # World up-axis
+  up_axis: "z"
+  # Enable the GPU pipeline
+  use_gpu_pipeline: ${eq:${...pipeline},"gpu"}
+  # Global gravity vector
+  gravity: [0.0, 0.0, -9.81]
+  # Low-level PhysX parameters
+  physx:
+    # Number of CPU threads
+    num_threads: ${....num_threads}
+    # Solver type (0=PGS, 1=TGS)
+    solver_type: ${....solver_type}
+    # Use GPU PhysX
+    use_gpu: ${contains:"cuda",${....sim_device}}
+    # Position iterations
+    num_position_iterations: 8
+    # Velocity iterations
+    num_velocity_iterations: 0
+    # Maximum GPU contact pairs
+    max_gpu_contact_pairs: 8388608
+    # Number of subscenes
+    num_subscenes: ${....num_subscenes}
+    # Contact offset
+    contact_offset: 0.002
+    # Rest offset
+    rest_offset: 0.0
+    # Bounce threshold velocity
+    bounce_threshold_velocity: 0.2
+    # Maximum depenetration velocity
+    max_depenetration_velocity: 100.0
+    # Default buffer size multiplier
+    default_buffer_size_multiplier: 5.0
+    # Contact collection mode
+    contact_collection: 2

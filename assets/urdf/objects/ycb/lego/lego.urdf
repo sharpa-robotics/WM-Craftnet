@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<robot name="lego">
+  <link name="base_link">
+    <visual>
+      <origin xyz="0.0 0.0 0.019645"/>
+      <geometry>
+        <mesh filename="lego.stl" scale="1.818182 1.818182 1.818182"/>
+      </geometry>
+      <material name="auto_color">
+        <color rgba="0.25 0.4 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.019645"/>
+      <geometry>
+        <mesh filename="lego.stl" scale="1.818182 1.818182 1.818182"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

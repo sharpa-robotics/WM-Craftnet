@@ -1,0 +1,38 @@
+defaults:
+  - WMCraftnetRotation
+
+# Keep task class binding to existing registered implementation.
+name: RealmanSharpaHa4CameraRotation
+
+env:
+  axis: "x"
+  objSet: "set_x4"
+  handInit: "x"
+  # Empty or omitted means train from scratch.
+  reward_max_spin_rate: 2.0
+  spin_coef: 1.0
+  torque_coef: -0.001
+  work_coef: -0.001
+  actionPenaltyScale: -0.000001
+  controlPenaltyScale: -0.001
+
+  finger_coef: 0.1
+  distanceRewardDeadzone: 0.025
+  distanceRewardPenaltyWidth: 0.03
+
+  handPoseNonThumbScale: 1.0
+  handPoseCoef: 0.5
+  axisDevPenaltyCoef: 0.001
+  objInitPosDeviationCoef: 100.0
+
+  tipForcePenaltyCoef: 0.9
+  tipForcePenaltyThresh: 2.0
+  tipForcePenaltyExpAlpha: 0.01
+
+  resetPositionNoise:
+    - 0.01
+    - 0.005
+    - 0.0025
+
+
+    

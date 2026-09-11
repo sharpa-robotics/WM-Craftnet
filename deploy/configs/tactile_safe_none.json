@@ -1,0 +1,27 @@
+{
+  "config_dir": "",
+  "none": {
+    "left": {
+      "model_path": [],
+      "allowed_pack_loss": 0,
+      "buffer_size": 2,
+      "batch_size": 1,
+      "num_worker": 1,
+      "fps": 30,
+      "infer_from_device": true,
+      "decode_jpeg": true,
+      "update_firmware": false
+    },
+    "right": {
+      "model_path": [],
+      "allowed_pack_loss": 0,
+      "buffer_size": 2,
+      "batch_size": 1,
+      "num_worker": 1,
+      "fps": 30,
+      "infer_from_device": true,
+      "decode_jpeg": true,
+      "update_firmware": false
+    }
+  }
+}

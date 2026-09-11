@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<robot name="object">
+  <link name="object">
+    <visual>
+      <origin xyz="0.0 0.0 0.0" rpy="-1.5707963 0 0"/>
+      <geometry>
+        <mesh filename="flashlight.stl" scale="1.2 1.2 0.8"/>
+      </geometry>
+      <material name="auto_color">
+        <color rgba="0.18 0.19 0.19 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="-1.5707963 0 0"/>
+      <geometry>
+        <mesh filename="flashlight.stl" scale="1.2 1.2 0.8"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

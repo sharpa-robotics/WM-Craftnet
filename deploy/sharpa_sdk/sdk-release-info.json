@@ -1,0 +1,68 @@
+[
+  {
+    "version": "5.0.2",
+    "releaseDate": "2026-06-22",
+    "compatibleFirmware": "2.0.3",
+    "compatiblePilot": "2.0.3",
+    "i18n": {
+      "en": {
+        "newFeatures": [
+          "1. Added motor firmware upload and batch upgrade APIs (placeholder for testing).",
+          "2. Added finalize_zero_calibration for auto zero-point calibration workflow.",
+          "3. Improved error reporting for motor update protocol compatibility."
+        ]
+      },
+      "zh-CN": {
+        "newFeatures": [
+          "1. 新增电机固件上传与批量升级 API（测试占位文案）。",
+          "2. 新增 finalize_zero_calibration，用于自动零点标定流程。",
+          "3. 优化电机升级协议兼容性相关错误提示。"
+        ]
+      }
+    }
+  },
+  {
+    "version": "5.0.3",
+    "releaseDate": "2026-06-22",
+    "compatibleFirmware": "2.0.3",
+    "compatiblePilot": "2.0.3",
+    "i18n": {
+      "en": {
+        "newFeatures": [
+          "1. Added reporting of error code 0x0241 when overcurrent protection is triggered (placeholder).",
+          "2. Exposed motor upgrade status query APIs in WaveSDK.",
+          "3. Internal stability improvements for device discovery and reconnect."
+        ]
+      },
+      "zh-CN": {
+        "newFeatures": [
+          "1. 新增过流保护触发时的错误码 0x0241 上报能力（测试占位文案）。",
+          "2. WaveSDK 暴露电机升级状态查询接口。",
+          "3. 优化设备发现与重连稳定性。"
+        ]
+      }
+    }
+  },
+  {
+    "version": "5.0.5",
+    "releaseDate": "2026-07-15",
+    "compatibleFirmware": "3.0.5",
+    "compatiblePilot": "2.0.5",
+    "i18n": {
+      "en": {
+        "newFeatures": [
+          "1. do something 1",
+          "2. do something 2",
+          "3. do something 3"
+        ]
+      },
+      "zh-CN": {
+        "newFeatures": [
+          "1. do something 1",
+          "2. do something 2",
+          "3. do something 3"
+        ]
+      }
+    }
+  }
+]

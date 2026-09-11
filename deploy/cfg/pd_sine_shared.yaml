@@ -1,0 +1,124 @@
+global:
+  # Keep frequency definition aligned with training task config.
+  active_joints:
+    - right_index_MCP_FE
+    - right_index_MCP_AA
+    - right_index_PIP
+    - right_index_DIP
+    - right_middle_MCP_FE
+    - right_middle_MCP_AA
+    - right_middle_PIP
+    - right_middle_DIP
+    - right_pinky_CMC
+    - right_pinky_MCP_FE
+    - right_pinky_MCP_AA
+    - right_pinky_PIP
+    - right_pinky_DIP
+    - right_ring_MCP_FE
+    - right_ring_MCP_AA
+    - right_ring_PIP
+    - right_ring_DIP
+    - right_thumb_CMC_FE
+    - right_thumb_CMC_AA
+    - right_thumb_MCP_FE
+    - right_thumb_MCP_AA
+    - right_thumb_IP
+  sim_dt: 0.01667
+  control_frequency_inv: 6
+  sine_freq_hz: 1.0
+  duration_s: 12.0
+  pre_position_settle_s: 1.0
+  sim_offset_settle_control_steps: 4
+  output_paths:
+    real_data_dir: deploy/pd_real
+    sim_tune_dir: deploy/pu_tune
+  adaptive_perturb:
+    init_ratio: 0.3
+    min_ratio: 0.01
+    max_ratio: 0.8
+    shrink_factor: 0.9
+    grow_factor: 1.25
+    improve_hi: 0.05
+    improve_lo: 0.005
+    patience_rounds: 5
+    warmup_rounds: 2
+  metric_weights:
+    phase: 1.0
+    amplitude: 2.5
+    state_mae: 1.5
+  metric_scales:
+    phase_rad: 0.35
+    amplitude_rad: 0.10
+    state_mae_rad: 0.08
+
+joints:
+  right_index_MCP_FE:
+    offset_deg: 36.0
+    amp_deg: 16.0
+  right_index_MCP_AA:
+    offset_deg: -6.5
+    amp_deg: 8.0
+  right_index_PIP:
+    offset_deg: 45.0
+    amp_deg: 16.0
+  right_index_DIP:
+    offset_deg: 36.0
+    amp_deg: 16.0
+
+  right_middle_MCP_FE:
+    offset_deg: 36.0
+    amp_deg: 16.0
+  right_middle_MCP_AA:
+    offset_deg: 0.0
+    amp_deg: 8.0
+  right_middle_PIP:
+    offset_deg: 45.0
+    amp_deg: 16.0
+  right_middle_DIP:
+    offset_deg: 36.0
+    amp_deg: 16.0
+
+  right_pinky_CMC:
+    offset_deg: 6.75
+    amp_deg: 5.4
+  right_pinky_MCP_FE:
+    offset_deg: 36.0
+    amp_deg: 16.0
+  right_pinky_MCP_AA:
+    offset_deg: 7.5
+    amp_deg: 6.8
+  right_pinky_PIP:
+    offset_deg: 45.0
+    amp_deg: 16.0
+  right_pinky_DIP:
+    offset_deg: 36.0
+    amp_deg: 16.0
+
+  right_ring_MCP_FE:
+    offset_deg: 36.0
+    amp_deg: 16.0
+  right_ring_MCP_AA:
+    offset_deg: 3.0
+    amp_deg: 6.0
+  right_ring_PIP:
+    offset_deg: 45.0
+    amp_deg: 16.0
+  right_ring_DIP:
+    offset_deg: 36.0
+    amp_deg: 16.0
+
+  right_thumb_CMC_FE:
+    offset_deg: 20.0
+    amp_deg: 12.0
+  right_thumb_CMC_AA:
+    offset_deg: -6.0
+    amp_deg: 8.0
+  right_thumb_MCP_FE:
+    offset_deg: 22.5
+    amp_deg: 16.0
+  right_thumb_MCP_AA:
+    offset_deg: 0.0
+    amp_deg: 8.0
+  right_thumb_IP:
+    offset_deg: 45.0
+    amp_deg: 16.0

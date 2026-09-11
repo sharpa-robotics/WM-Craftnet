@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<robot name="bulb">
+  <link name="base_link">
+    <visual>
+      <origin xyz="0.0 0.0 0.031628" rpy="0 1.5707963 0"/>
+      <geometry>
+        <mesh filename="bulb.stl" scale="1.2 1.38114 1.38134"/>
+      </geometry>
+      <material name="auto_color">
+        <color rgba="0.86 0.80 0.62 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.031628" rpy="0 1.5707963 0"/>
+      <geometry>
+        <mesh filename="bulb.stl" scale="1.2 1.38114 1.38134"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

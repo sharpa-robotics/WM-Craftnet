@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<robot name="bottle_y_axis">
+  <link name="base_link">
+    <visual>
+      <origin xyz="0.0 -0.045079 0.000372" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="coca_can.STL" scale="0.0011358 0.00093344 0.0011358"/>
+      </geometry>
+      <material name="auto_color">
+        <color rgba="0.55 0.18 0.18 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 -0.045079 0.000372" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="coca_can.STL" scale="0.0011358 0.00093344 0.0011358"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

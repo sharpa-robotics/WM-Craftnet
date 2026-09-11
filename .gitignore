@@ -1,0 +1,29 @@
+*.egg-info/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+wandb/
+data/
+outputs/
+replay_recordings/
+deploy/logs/
+ckpts/
+*.log
+*.mp4
+events.out.tfevents*
+
+# Ignore all local experiment outputs.
+runs/**
+
+# Keep released checkpoint YAML; omit .pth weights (over GitHub's 100 MB limit).
+example_ckpt/**
+!example_ckpt/*.yaml
+*.pth
+
+/1494_WM_Craftnet_World_Synesth.pdf
+/test/
+/trajs/
+/cankao/
+/gemini/
+/WMP/

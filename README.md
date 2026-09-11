@@ -1,11 +1,12 @@
-# WM-Craftnet: World Synesthesia Model for Generalizable and Robust Dexterous In-Hand Manipulation
+<div align="center">
 
-**Jie Yin, Zeyuan Zhao, Xiaojing Tan, Yang Liu, Chiyu Wang, Xinyang Gu**
+# WM-Craftnet: World Synesthesia Model for Generalizable and Robust<br>Dexterous In-Hand Manipulation**
 
-**Sharpa Robotics**
+Jie Yin &ensp;·&ensp; Zeyuan Zhao &ensp;·&ensp; Xiaojing Tan &ensp;·&ensp; Yang Liu &ensp;·&ensp; Chiyu Wang &ensp;·&ensp; Xinyang Gu
 
-**CoRL 2026**
+Sharpa Robotics &nbsp;·&nbsp; Conference on Robot Learning (CoRL) 2026
 
+<br>
 
 [![Website](https://img.shields.io/badge/Website-WM--Craftnet-blue)](https://wmcraftnet.github.io)
 [![arXiv](https://img.shields.io/badge/arXiv-2609.07002-b31b1b)](https://arxiv.org/abs/2609.07002)
@@ -32,7 +33,7 @@ WM-Craftnet learns a **World Synesthesia Model (WSM)** from proprioception, nois
 
 - **Predictive visuotactile state:** fuses proprioception, depth, touch, and action history while denoising hand–object geometry.
 - **Robust and generalizable control:** handles multiple objects, unseen geometries, pose shifts, drift, and external disturbances.
-- **Reusable physical prior:** a WSM pretrained on nine z-axis objects initializes downstream learning over 49 objects.
+- **Reusable physical prior:** a WSM pretrained on nine z-axis objects can initialize downstream learning on other object sets.
 - **Real-robot deployment:** transfers to the human-sized, five-finger, 22-DoF Sharpa Wave hand using deployable sensors.
 
 ## Method Overview
@@ -99,11 +100,6 @@ bash scripts/train_wm_craftnet_x.sh task.env.objSet=set_x4
 
 # y-axis rotation on nine tool-like objects
 bash scripts/train_wm_craftnet_y.sh task.env.objSet=set_y
-
-# z-axis downstream training on 49 objects from the nine-object WSM prior
-bash scripts/train_wm_craftnet_z.sh \
-  task.env.objSet=set49 \
-  task.env.cameraPolicy.worldModel.resume_body_from=example_ckpt/wm_craftnet_set_z.pth
 ```
 
 The official training setup uses `num_envs=1024` and `minibatch_size=4096`
@@ -148,23 +144,14 @@ weights use the legacy proprioception-plus-depth setup; test them with
 
 ## Testing
 
-Released z-axis checkpoints:
+Released z-axis checkpoint:
 
-- `example_ckpt/wm_craftnet_set_z.pth`: nine-object z-axis policy.
-- `example_ckpt/wm_craftnet_set49.pth`: 49-object z-axis policy initialized from the reusable WSM prior.
+- `example_ckpt/wm_craftnet_set_z.pth` (+ sibling `.yaml`): nine-object z-axis policy.
 
 Run interactive testing for the nine-object model:
 
 ```bash
 CHECKPOINT=example_ckpt/wm_craftnet_set_z.pth \
-bash scripts/test_wm_craftnet.sh
-```
-
-Run the 49-object model:
-
-```bash
-CHECKPOINT=example_ckpt/wm_craftnet_set49.pth \
-TEST_OBJ_SET=set49 \
 bash scripts/test_wm_craftnet.sh
 ```
 
@@ -175,7 +162,6 @@ The test script opens the viewer by default and accepts additional Hydra argumen
 - `set_z`: nine diverse objects for z-axis rotation and WSM pretraining.
 - `set_x4`: four objects for contact-constrained x-axis rotation.
 - `set_y`: nine elongated or tool-like objects for y-axis rotation.
-- `set49`: 49 objects for downstream z-axis policy learning from the reusable nine-object WSM prior.
 
 Object meshes, robot assets, and datasets may have terms independent of this repository. Consult [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) before redistribution.
 
@@ -229,6 +215,10 @@ build requires CUDA 13.x and TensorRT 10.x.
 
 ### Run on the real robot
 
+The default checkpoint is
+[`example_ckpt/wm_craftnet_set_z.pth`](example_ckpt/wm_craftnet_set_z.pth).
+Each released weight has a sibling YAML of the same stem, for example
+[`example_ckpt/wm_craftnet_set_z.yaml`](example_ckpt/wm_craftnet_set_z.yaml).
 Configure `checkpoint`, camera settings, `no_actuation`, and `max_steps` in
 `build_hardcoded_config()` inside
 [`deploy/examples/wm_craftnet_infer.py`](deploy/examples/wm_craftnet_infer.py).
@@ -249,7 +239,7 @@ depth preprocessing as training, not just the same checkpoint.
 | Simulation camera resolution and approximate intrinsics (`width`, `height`, `fov`) | same block: `task.env.cameraPolicy.sensor` |
 | Depth crop that defines the final policy input size | same file → `task.env.cameraPolicy.depth_preprocess.crop` (`top_px`, `bottom_px`, `left_px`, `right_px`) |
 | RealSense stream resolution and frame rate | [`deploy/examples/wm_craftnet_infer.py`](deploy/examples/wm_craftnet_infer.py) → `build_hardcoded_config()` (`cam_width`, `cam_height`, `cam_fps`) |
-| Checkpoint path and safe dry-run switches | same function (`checkpoint`, `no_actuation`, `max_steps`) |
+| Checkpoint path and safe dry-run switches | same function (`checkpoint`, `no_actuation`, `max_steps`); keep a sibling `<name>.yaml` next to `<name>.pth` |
 
 Practical workflow:
 
@@ -296,4 +286,6 @@ If you find WM-Craftnet useful, please cite:
 
 ## License
 
-Original WM-Craftnet code is released under the [Apache License, Version 2.0](LICENSE), except where a file or component carries a different notice. This license does not relicense third-party code, Isaac Gym, datasets, robot or object assets, SDKs, binaries, or pretrained materials. See [`NOTICE`](NOTICE) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for details.
+This repository is released under the [Apache License, Version 2.0](LICENSE).
+See [`NOTICE`](NOTICE) for the license scope and third-party attribution, and
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for additional component notes.

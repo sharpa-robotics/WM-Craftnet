@@ -1,0 +1,51 @@
+{
+  "config_dir": "",
+  "none": {
+    "left": {
+      "model_path": {},
+      "allowed_pack_loss": 0,
+      "buffer_size": 2,
+      "batch_size": 5,
+      "num_worker": 3,
+      "fps": 30,
+      "infer_from_device": false,
+      "decode_jpeg": false,
+      "update_firmware": false
+    },
+    "right": {
+      "model_path": {},
+      "allowed_pack_loss": 0,
+      "buffer_size": 2,
+      "batch_size": 5,
+      "num_worker": 3,
+      "fps": 30,
+      "infer_from_device": false,
+      "decode_jpeg": false,
+      "update_firmware": false
+    }
+  },
+  "cuda": {
+    "left": {
+      "model_path": {},
+      "allowed_pack_loss": 0,
+      "buffer_size": 2,
+      "batch_size": 5,
+      "num_worker": 3,
+      "fps": 180,
+      "infer_from_device": false,
+      "decode_jpeg": false,
+      "update_firmware": false
+    },
+    "right": {
+      "model_path": {},
+      "allowed_pack_loss": 0,
+      "buffer_size": 2,
+      "batch_size": 5,
+      "num_worker": 3,
+      "fps": 30,
+      "infer_from_device": false,
+      "decode_jpeg": false,
+      "update_firmware": false
+    }
+  }
+}
