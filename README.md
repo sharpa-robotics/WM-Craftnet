@@ -46,21 +46,21 @@ The model also reconstructs clean depth from noisy observations, which improves 
 <table>
   <tr>
     <td valign="top" width="33%">
-      <video src="docs/media/demos/z_duck.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/demos/z_duck.gif" width="100%" alt="Duck z-axis rotation in simulation">
       <br/>
       <b>Duck</b> · z-axis
       <br/>
       Stable finger contacts on a curved, asymmetric object during continuous z-axis rotation.
     </td>
     <td valign="top" width="33%">
-      <video src="docs/media/demos/y_flashlight.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/demos/y_flashlight.gif" width="100%" alt="Flashlight y-axis rotation in simulation">
       <br/>
       <b>Flashlight</b> · y-axis
       <br/>
       Target-axis rotation of an elongated body about its shorter axis under larger moment arms.
     </td>
     <td valign="top" width="33%">
-      <video src="docs/media/demos/x_stepped_block.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/demos/x_stepped_block.gif" width="100%" alt="Stepped block x-axis rotation in simulation">
       <br/>
       <b>Stepped block</b> · x-axis
       <br/>
@@ -69,21 +69,21 @@ The model also reconstructs clean depth from noisy observations, which improves 
   </tr>
   <tr>
     <td valign="top" width="33%">
-      <video src="docs/media/demos/adj_bottle.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/demos/adj_bottle.gif" width="100%" alt="Bottle thumb-guided re-centering then y-axis rotation">
       <br/>
       <b>Bottle</b> · thumb-guided re-centering
       <br/>
       0–10 s: thumb draws the bottle toward the fingers, then y-axis rotation continues.
     </td>
     <td valign="top" width="33%">
-      <video src="docs/media/demos/adj_coke_can.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/demos/adj_coke_can.gif" width="100%" alt="Coke can five-finger stabilization then z-axis rotation">
       <br/>
       <b>Coke Can</b> · five-finger stabilization
       <br/>
       0–5 s: all five fingers upright the can from a poor start, then z-axis rotation resumes.
     </td>
     <td valign="top" width="33%">
-      <video src="docs/media/demos/adj_cross_block.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/demos/adj_cross_block.gif" width="100%" alt="Cross block palm-to-finger transfer then z-axis rotation">
       <br/>
       <b>Cross block</b> · palm-to-finger transfer
       <br/>
@@ -214,21 +214,21 @@ Hardware examples are under [`deploy/`](deploy/). Use **Python 3.10** for deploy
 <table>
   <tr>
     <td align="center" valign="top" width="33%">
-      <video src="docs/media/real-robot-duck.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/real-robot-duck.gif" width="100%" alt="Real z-axis duck rotation on Sharpa Wave">
       <br/>
       <b>Real Z-Axis Duck Rotation</b>
       <br/>
       WM-Craftnet rotates a duck on the Sharpa Wave hand using wrist depth and tactile feedback.
     </td>
     <td align="center" valign="top" width="33%">
-      <video src="docs/media/depth_real_16x9.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/depth_real_16x9.gif" width="100%" alt="Real noisy wrist depth">
       <br/>
       <b>Real Noisy Wrist Depth</b>
       <br/>
       Raw depth from the wrist camera during the same rollout—noisy, incomplete, and hard to use directly for control.
     </td>
     <td align="center" valign="top" width="33%">
-      <video src="docs/media/depth_pred_16x9.mp4" width="100%" autoplay muted loop playsinline></video>
+      <img src="docs/media/depth_pred_16x9.gif" width="100%" alt="WSM predicted depth from latent state">
       <br/>
       <b>Real Predicted Depth from WSM Latent</b>
       <br/>
