@@ -11,6 +11,7 @@ deploy/logs/
 ckpts/
 *.log
 *.mp4
+!docs/media/demos/*.mp4
 events.out.tfevents*
 
 # Ignore all local experiment outputs.
