@@ -526,10 +526,6 @@ class ConvEncoder(nn.Module):
         x = obs.reshape((-1,) + tuple(obs.shape[-3:]))
         # (batch * time, h, w, ch) -> (batch * time, ch, h, w)
         x = x.permute(0, 3, 1, 2)
-        # print('init encoder shape:', x.shape)
-        # for layer in self.layers:
-        #     x = layer(x)
-        #     print(x.shape)
         x = self.layers(x)
         # (batch * time, ...) -> (batch * time, -1)
         x = x.reshape([x.shape[0], np.prod(x.shape[1:])])
@@ -641,10 +637,6 @@ class ConvDecoder(nn.Module):
         )
         # (batch, time, -1) -> (batch * time, ch, h, w)
         x = x.permute(0, 3, 1, 2)
-        # print('init decoder shape:', x.shape)
-        # for layer in self.layers:
-        #     x = layer(x)
-        #     print(x.shape)
         x = self.layers(x)
         # (batch, time, -1) -> (batch, time, ch, h, w)
         mean = x.reshape(features.shape[:-1] + self._shape)

@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# Additional WM-Craftnet modifications Copyright (c) 2026 The WM-Craftnet Authors.
+# Additional WM-Craftnet modifications Copyright 2026 Sharpa Group.
 
 from .networks import *
 from .tools import *

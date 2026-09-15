@@ -99,12 +99,6 @@ env:
   noSpinAngVelThresh: 0.5
   noSpinMaxSteps: 60
   noSpinResetPenalty: -50.0
-  # In-process perturbation: translate the object in a world-space direction at control-step intervals to test policy recovery.
-  inProcessPerturbation:
-    enabled: False
-    intervalControlSteps: 100
-    direction: [1.0, 0.2, 0.0]
-    distance: 0.02
   # Gravity curriculum (false=fixed vertical gravity, true=random direction with curriculum)
   gravityCurriculum:
     # Enable the random gravity-direction curriculum

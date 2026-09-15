@@ -32,8 +32,6 @@ import isaacgym  # Must be imported before torch-backed task modules.
 from .wm_craftnet_rotation import RealmanSharpaHa4Rotation
 from .wm_craftnet_camera_rotation import RealmanSharpaHa4CameraRotation
 
-
-
 # Mappings from strings to environments
 isaacgym_task_map = {
     "RealmanSharpaHa4Rotation": RealmanSharpaHa4Rotation,

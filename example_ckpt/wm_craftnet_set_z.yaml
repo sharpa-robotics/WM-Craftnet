@@ -162,14 +162,6 @@ task:
     noSpinAngVelThresh: 0.5
     noSpinMaxSteps: 60
     noSpinResetPenalty: -50.0
-    inProcessPerturbation:
-      enabled: false
-      intervalControlSteps: 100
-      direction:
-      - 1.0
-      - 0.2
-      - 0.0
-      distance: 0.02
     gravityCurriculum:
       enabled: true
       startMaxAngleDeg: 1.0

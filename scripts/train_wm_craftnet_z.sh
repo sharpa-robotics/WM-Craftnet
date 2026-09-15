@@ -33,8 +33,6 @@ sanitize_colon_path_var() {
     export "${var_name}=${cleaned}"
 }
 
-
-
 # IsaacLab/IsaacSim paths in parent shell may conflict with Isaac Gym Preview4.
 sanitize_colon_path_var "PYTHONPATH" "/_isaac_sim"
 sanitize_colon_path_var "LD_LIBRARY_PATH" "/_isaac_sim"

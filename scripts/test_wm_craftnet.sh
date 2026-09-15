@@ -20,7 +20,6 @@ RL_GPU=""
 GRAPHICS_GPU=0
 # Viewer on by default for this script.
 HEADLESS="${HEADLESS:-false}"
-inprocess_perturbation="${inprocess_perturbation:-false}"
 TEST_OBJ_SET="${TEST_OBJ_SET:-set_z}"
 TEST_EPISODE_LENGTH="${TEST_EPISODE_LENGTH:-490}"
 
@@ -100,7 +99,6 @@ to_bool() {
 }
 
 HEADLESS_BOOL=$(to_bool "${HEADLESS}")
-INPROCESS_PERTURBATION_BOOL=$(to_bool "${inprocess_perturbation}")
 
 echo "[test-viz] checkpoint=${CHECKPOINT}"
 echo "[test-viz] objSet=${TEST_OBJ_SET} axis=${TEST_AXIS} numEnvs=${TEST_NUM_ENVS} headless=${HEADLESS_BOOL}"
@@ -118,7 +116,6 @@ task.env.numEnvs=${TEST_NUM_ENVS} \
 task.env.episodeLength=${TEST_EPISODE_LENGTH} \
 task.env.objSet=${TEST_OBJ_SET} \
 ++task.env.isTestRun=True \
-task.env.inProcessPerturbation.enabled=${INPROCESS_PERTURBATION_BOOL} \
 "${WM_HEAD_ARGS[@]}" \
 task.env.evalMetrics.enabled=False \
 task.env.cameraDemo.enabled=False \

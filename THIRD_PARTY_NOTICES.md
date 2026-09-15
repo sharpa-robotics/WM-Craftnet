@@ -1,12 +1,17 @@
 # Third-Party Notices
 
-WM-Craftnet builds on third-party software, simulation tools, robot interfaces,
-datasets, and assets. Those materials are **not** relicensed by the
-repository-level Apache License, Version 2.0. Each component remains governed by
-its own copyright notice, license, and distribution terms.
+Original WM-Craftnet material is **Copyright 2026 Sharpa Group** and is licensed
+under the Apache License, Version 2.0. See [`LICENSE`](LICENSE) and
+[`NOTICE`](NOTICE).
 
-See also [`NOTICE`](NOTICE) for attribution required by the Apache License and
-the complete upstream license texts copied from the linked repositories.
+WM-Craftnet builds on third-party software, simulation tools, robot interfaces,
+datasets, and assets. Those materials are **not** relicensed by Sharpa Group
+under Apache-2.0. Each component remains governed by its own copyright notice,
+license, and distribution terms.
+
+See also [`NOTICE`](NOTICE) for the Sharpa Group copyright statement, Apache
+attribution required by the license, and the complete upstream license texts
+copied from the linked repositories.
 
 ## Open-source code incorporated or adapted in this repository
 
@@ -25,8 +30,8 @@ notices when redistributing modified source.
 
 ## External software obtained separately
 
-The following components are **not** bundled under the WM-Craftnet Apache-2.0
-license and must be obtained and used under their own terms:
+The following components are **not** bundled under the Sharpa Group Apache-2.0
+grant and must be obtained and used under their own terms:
 
 - **NVIDIA Isaac Gym Preview 4** — download from
   [NVIDIA Isaac Gym](https://developer.nvidia.com/isaac-gym). Governed by
@@ -44,8 +49,8 @@ license and must be obtained and used under their own terms:
 Robot descriptions, meshes, URDFs, textures, object models, demonstration data,
 and derived assets under `assets/` or other data directories may originate from
 multiple sources. Each asset remains governed by its source license or
-permission. Inclusion in this repository does not imply that the WM-Craftnet
-authors own the asset or can relicense it under Apache-2.0.
+permission. Inclusion in this repository does not imply that Sharpa Group
+owns the asset or can relicense it under Apache-2.0.
 
 Before redistributing a release, verify the provenance and redistribution terms
 of every included asset and binary. Remove any material for which

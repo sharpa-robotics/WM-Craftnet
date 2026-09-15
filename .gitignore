@@ -22,9 +22,5 @@ example_ckpt/**
 !example_ckpt/*.yaml
 *.pth
 
-/1494_WM_Craftnet_World_Synesth.pdf
 /test/
 /trajs/
-/cankao/
-/gemini/
-/WMP/

@@ -205,22 +205,6 @@ class RealmanSharpaHa4Rotation(VecTask):
         self.force_scale = self.cfg["env"].get("forceScale", 0.0)
         self.random_force_prob_scalar = self.cfg["env"].get("forceProbScalar", 0.25)
         self.force_decay = self.cfg["env"].get("forceDecay", 0.99)
-        perturb_cfg = self.cfg["env"].get("inProcessPerturbation", {})
-        if not isinstance(perturb_cfg, dict):
-            perturb_cfg = {}
-        self.in_process_perturb_enabled = bool(perturb_cfg.get("enabled", False))
-        self.perturb_interval_control_steps = int(perturb_cfg.get("intervalControlSteps", 200))
-        self.perturb_distance = float(perturb_cfg.get("distance", 0.03))
-        perturb_direction = perturb_cfg.get("direction", [1.0, 0.0, 0.0])
-        if (
-            not isinstance(perturb_direction, Sequence)
-            or isinstance(perturb_direction, (str, bytes))
-            or len(perturb_direction) != 3
-        ):
-            raise ValueError(
-                f"inProcessPerturbation.direction must be a length-3 list, got {perturb_direction}"
-            )
-        self.perturb_direction_cfg = tuple(float(v) for v in perturb_direction)
         self.rotation_axis = self.cfg["env"]["axis"]
 
         friction_randomization_cfg = self.cfg["env"].get("frictionRandomization", {})
@@ -892,7 +876,6 @@ class RealmanSharpaHa4Rotation(VecTask):
 
     def create_object_asset_dict(self, asset_root):
         self.object_asset_dict = {}
-        print("ENTER ASSET CREATING!")
         for used_objects in self.used_training_objects:
             object_asset_file = self.asset_files_dict[used_objects]
             object_asset_options = gymapi.AssetOptions()
@@ -1379,7 +1362,6 @@ class RealmanSharpaHa4Rotation(VecTask):
 
         self.hand_indices = to_torch(self.hand_indices, dtype=torch.long, device=self.device)
         self.object_indices = to_torch(self.object_indices, dtype=torch.long, device=self.device)
-        self._init_in_process_perturbation_state()
 
         self.contact_handles = [
             self.gym.find_asset_rigid_body_index(arm_hand_asset, name) for name in self.arm_hand_body_names
@@ -1718,66 +1700,12 @@ class RealmanSharpaHa4Rotation(VecTask):
                                                                             (len(env_ids), ))]
         return
 
-    def _init_in_process_perturbation_state(self):
-        direction = torch.tensor(
-            self.perturb_direction_cfg, dtype=torch.float, device=self.device
-        )
-        direction_norm = torch.norm(direction)
-        if direction_norm < 1e-8:
-            raise ValueError("inProcessPerturbation.direction must be non-zero")
-        self.perturb_direction = direction / direction_norm
-        self.perturb_last_trigger_step = torch.full(
-            (self.num_envs,), -1, dtype=torch.long, device=self.device
-        )
-
-    def _reset_in_process_perturbation(self, env_ids):
-        if not hasattr(self, "perturb_last_trigger_step"):
-            return
-        env_ids_torch = torch.as_tensor(env_ids, device=self.device, dtype=torch.long)
-        if env_ids_torch.numel() == 0:
-            return
-        self.perturb_last_trigger_step[env_ids_torch] = -1
-
-    def _set_object_root_states_for_envs(self, env_ids_torch):
-        if env_ids_torch.numel() == 0:
-            return
-        obj_indices = self.object_indices[env_ids_torch].reshape(-1).to(torch.int32)
-        self.gym.set_actor_root_state_tensor_indexed(
-            self.sim,
-            gymtorch.unwrap_tensor(self.root_state_tensor),
-            gymtorch.unwrap_tensor(obj_indices),
-            obj_indices.numel(),
-        )
-
-    def _update_in_process_perturbation(self):
-        if not self.in_process_perturb_enabled:
-            return
-        if self.perturb_interval_control_steps <= 0 or self.perturb_distance <= 0.0:
-            return
-
-        progress = self.progress_buf
-        trigger_mask = (
-            (progress > 0)
-            & ((progress % self.perturb_interval_control_steps) == 0)
-            & (self.perturb_last_trigger_step != progress)
-            & (self.reset_buf == 0)
-        )
-        trigger_ids = torch.where(trigger_mask)[0]
-        if trigger_ids.numel() == 0:
-            return
-
-        obj_indices = self.object_indices[trigger_ids]
-        self.root_state_tensor[obj_indices, 0:3] += self.perturb_distance * self.perturb_direction.unsqueeze(0)
-        self.perturb_last_trigger_step[trigger_ids] = progress[trigger_ids]
-        self._set_object_root_states_for_envs(trigger_ids)
-
     def update_controller(self):
         previous_dof_pos = self.arm_hand_dof_pos.clone()
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_actor_root_state_tensor(self.sim)
         self.gym.refresh_rigid_body_state_tensor(self.sim)
         self.gym.refresh_net_contact_force_tensor(self.sim)
-        self._update_in_process_perturbation()
 
         if self.asymmetric_obs:
             self.gym.refresh_force_sensor_tensor(self.sim)
@@ -1937,7 +1865,6 @@ class RealmanSharpaHa4Rotation(VecTask):
         self.reset_buf[env_ids] = 0
         self.successes[env_ids] = 0
         self.no_spin_counter[env_ids] = 0
-        self._reset_in_process_perturbation(env_ids)
 
         for env_id in env_ids:
             self.object_init_pos[env_id] = self.root_state_tensor[self.object_indices[env_id], 0:3]
@@ -1953,7 +1880,6 @@ class RealmanSharpaHa4Rotation(VecTask):
             on_reset(env_ids)
 
     def pre_physics_step(self, actions):
-        # print("time:",time.time()-self.time)
         self.time = time.time()
 
         env_ids = self.reset_buf.nonzero(as_tuple=False).squeeze(-1)
@@ -2283,7 +2209,6 @@ class RealmanSharpaHa4Rotation(VecTask):
     def post_physics_step(self):
         self.progress_buf += 1
         self.randomize_buf += 1
-        # print(f'progress_buf:{self.progress_buf[0].item()}')
 
         if self.rotation_axis == 'all':
             env_ids = list(torch.where(torch.rand(self.num_envs) < 1 / 500)[0])
