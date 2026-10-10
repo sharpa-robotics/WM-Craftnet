@@ -1,3 +1,4 @@
+
 # WM-Craftnet: World Synesthesia Model for Generalizable and Robust Dexterous In-Hand Manipulation
 
 <p align="center">
@@ -27,6 +28,7 @@
 [![License](https://img.shields.io/badge/License-Apache--2.0-8b949e)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-SharpaWave-10b981)](https://www.sharpa.com/pages/wave)
 [![Simulator](https://img.shields.io/badge/Simulator-Isaac%20Gym-76b900)](https://developer.nvidia.com/isaac-gym)
+
 
 <p align="center">
   <a href="https://wmcraftnet.github.io">
