@@ -315,6 +315,18 @@ The policy expects the same field of view and depth preprocessing as training—
 > [!CAUTION]
 > A learned policy can command sudden, unexpected motion. Before sending any command, confirm the robot identity and network connection, test the emergency stop, enforce joint and torque limits, clear people and obstacles from the workspace, and begin at reduced speed under direct supervision.
 
+### Run on Intel GPU (XPU)
+
+The deployment inference (WSM and policy) also runs on Intel GPUs, such as the Arc Pro B60, through PyTorch's XPU backend. In the deployment environment, install the XPU build of PyTorch instead of the CUDA build, then the packages the deploy scripts import:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/xpu
+pip install gym numpy omegaconf hydra-core pyyaml pyrealsense2 pyzmq
+python deploy/examples/wm_craftnet_infer.py
+```
+
+`build_hardcoded_config()` picks the device by itself: CUDA first, then XPU, then the CPU. Set `device` there (for example `"xpu:0"`) to choose one. Simulation, training and evaluation use Isaac Gym, which needs an NVIDIA GPU, so they stay CUDA-only.
+
 ---
 
 ## Acknowledgements
