@@ -227,7 +227,7 @@ Checkpoint and head configs must match at train and test time. The released chec
 
 ## Real-Robot Deployment
 
-Hardware examples are under [`deploy/`](deploy/). Use **Python 3.10** for deployment; simulation and training stay on **Python 3.8**.
+The released deployment targets a Sharpa Wave hand with an Intel RealSense D405 wrist camera. Runtime examples are under [`deploy/`](deploy/), and the camera-mount CAD models are under [`assets/cad/wrist_camera_mount/`](assets/cad/wrist_camera_mount/). Use **Python 3.10** for deployment; simulation and training stay on **Python 3.8**.
 
 <table>
   <tr>
@@ -257,7 +257,22 @@ Hardware examples are under [`deploy/`](deploy/). Use **Python 3.10** for deploy
 
 On real hardware, the wrist depth stream is noisy and incomplete. The WSM latent reconstructs a cleaner depth representation that preserves hand–object geometry—supporting the same policy at deployment time. More rollouts are on the [project website](https://wmcraftnet.github.io/#depth-reconstruction).
 
-### 1. Install Sharpa Wave SDK
+### 1. Prepare the hardware
+
+The current mounting hardware uses an **Intel RealSense D405**. The **Intel RealSense L515** reported in the paper belongs to an earlier hardware revision and is not the camera modeled by the STEP files below.
+
+#### D405 wrist-camera mounts
+
+Two mount variants are provided for the alternative camera-to-hand-bracket interfaces:
+
+| Hand-bracket interface | STEP model |
+| --- | --- |
+| Six-bolt circular pattern | [`sharpa_wave_wrist_camera_mount_6_bolt.step`](assets/cad/wrist_camera_mount/sharpa_wave_wrist_camera_mount_6_bolt.step) |
+| Four-bolt square pattern | [`sharpa_wave_wrist_camera_mount_4_bolt.step`](assets/cad/wrist_camera_mount/sharpa_wave_wrist_camera_mount_4_bolt.step) |
+
+Choose the model that matches your hand bracket. Before manufacturing or assembly, verify all interface dimensions, fastener clearances, camera field of view, and collision-free hand motion against your hardware revision.
+
+### 2. Install the Sharpa Wave SDK
 
 Download from the [Sharpa download page](https://www.sharpa.com/pages/downloads) or [GitHub releases](https://github.com/sharpa-robotics/sharpa-wave-sdk/releases). On x86-64 Ubuntu, run from the repository root to install the public non-CUDA SDK v5.0.9 under `deploy/sharpa_sdk/`:
 
@@ -284,36 +299,48 @@ rm -rf "$SDK_TMP" "$SDK_DEB"
 
 The non-CUDA build receives 30 Hz tactile inference from the hand. The optional CUDA SDK build requires CUDA 13.x and TensorRT 10.x.
 
-### 2. Configure and run
+### 3. Configure inference
 
-Download [`wm_craftnet_set_z.pth`](https://huggingface.co/SharpaIT/WM-Craftnet/blob/main/wm_craftnet_set_z.pth) into `example_ckpt/` with sibling [`example_ckpt/wm_craftnet_set_z.yaml`](example_ckpt/wm_craftnet_set_z.yaml). Set `checkpoint`, camera options, `no_actuation`, and `max_steps` in `build_hardcoded_config()` inside [`deploy/examples/wm_craftnet_infer.py`](deploy/examples/wm_craftnet_infer.py):
+Download [`wm_craftnet_set_z.pth`](https://huggingface.co/SharpaIT/WM-Craftnet/blob/main/wm_craftnet_set_z.pth) into `example_ckpt/` beside [`wm_craftnet_set_z.yaml`](example_ckpt/wm_craftnet_set_z.yaml). In `build_hardcoded_config()` inside [`wm_craftnet_infer.py`](deploy/examples/wm_craftnet_infer.py), set the checkpoint path and camera options. For the first run, use `no_actuation=True` and a finite `max_steps`:
 
 ```bash
 conda activate inhand_deploy310
 python deploy/examples/wm_craftnet_infer.py
 ```
 
-### 3. Align the depth camera
+Keep actuation disabled until the calibration and safety checks below are complete.
 
-The policy expects the same field of view and depth preprocessing as training—not just the same checkpoint.
+### 4. Calibrate and validate sim-to-real deployment
 
-| What to tune | Where to edit |
+The policy depends on the complete observation and control stack—not just the checkpoint. Match the real setup to training, then tune the simulation and domain-randomization ranges from measurements of the actual hardware.
+
+| What to calibrate | Configuration |
 | --- | --- |
-| Simulation camera pose (`pos`, `rot`) | [`WMCraftnetRotation.yaml`](isaacgymenvs/cfg/task/WMCraftnetRotation.yaml) → `task.env.cameraPolicy.sensor` |
-| Simulation resolution / intrinsics (`width`, `height`, `fov`) | same block |
-| Depth crop for policy input | same file → `task.env.cameraPolicy.depth_preprocess.crop` |
+| Camera extrinsics (`pos`, `rot`) | [`WMCraftnetRotation.yaml`](isaacgymenvs/cfg/task/WMCraftnetRotation.yaml) → `task.env.cameraPolicy.sensor` |
+| Camera resolution and intrinsics (`width`, `height`, `fov`) | same `sensor` block |
+| Depth crop and observation DR | same file → `task.env.cameraPolicy.depth_preprocess.{crop,noise}` |
+| Hand dynamics and dynamics DR | same file → `frictionRandomization`, `pdRandomization`, and `randomization_params` |
 | RealSense stream (`cam_width`, `cam_height`, `cam_fps`) | [`wm_craftnet_infer.py`](deploy/examples/wm_craftnet_infer.py) → `build_hardcoded_config()` |
-| Checkpoint path and dry-run switches | same function (`checkpoint`, `no_actuation`, `max_steps`) |
-
-**Suggested workflow**
-
-1. Mount the physical depth camera to match `cameraPolicy.sensor.pos` / `rot`.
-2. Set the RealSense stream; runtime resizes depth to `96 × 72` before applying `depth_preprocess.crop`.
-3. If the real view differs from simulation, adjust crop margins—not the policy input size.
-4. Start with `no_actuation=True` and verify the depth preview before enabling actuation.
+| Control period | Checkpoint YAML → `sim.dt` and `task.env.controlFrequencyInv`; runtime derives `control_hz` from both |
+| Checkpoint and dry-run switches | `build_hardcoded_config()` → `checkpoint`, `no_actuation`, and `max_steps` |
 
 > [!CAUTION]
 > A learned policy can command sudden, unexpected motion. Before sending any command, confirm the robot identity and network connection, test the emergency stop, enforce joint and torque limits, clear people and obstacles from the workspace, and begin at reduced speed under direct supervision.
+
+#### Recommended validation sequence
+
+1. Mount the D405 and measure its pose relative to the hand; update the simulated camera extrinsics accordingly.
+2. Configure the RealSense stream. Runtime resizes depth to `96 × 72` before applying `depth_preprocess.crop`.
+3. Measure the real hand response, contact behavior, and depth artifacts; tune dynamics and depth-observation DR to cover the observed conditions.
+4. Compare real and simulated depth. Correct camera pose first, then crop and noise settings—do not change the policy input size.
+5. Run with `no_actuation=True`; inspect the depth preview, telemetry, inference latency, and control-loop overruns.
+6. Verify the emergency stop and motion limits, then enable actuation at reduced speed before increasing performance.
+
+> [!TIP]
+> **Control-rate tuning.** After validating end-to-end latency and hardware safety, training and deploying with a matched **20 Hz or 30 Hz** control loop can provide smoother motion than the released 10 Hz timing. Keep the checkpoint timing and real control loop synchronized.
+
+> [!NOTE]
+> **Follow-up work and planned open source.** For our latest work on dexterous reorientation, see [**TacBPM: A Tactile-conditioned Behavior Prior Model for Dexterous Reorientation**](https://arxiv.org/abs/2609.18174). Its code and associated resources will be open-sourced in a future release—please stay tuned.
 
 ---
 
