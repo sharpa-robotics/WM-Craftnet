@@ -114,16 +114,16 @@ More real-robot, multi-axis, depth-reconstruction, and unseen-object rollouts ar
 
 ---
 
-## 5. Getting Started
+## 5. Quick Start
 
-### 5.1 Installation
-
-**Requirements**
+### 5.1 Requirements
 
 - Linux with an NVIDIA GPU and a compatible CUDA driver
 - Python 3.8
 - PyTorch 2.1.0 with CUDA 11.8
 - NVIDIA Isaac Gym Preview 4
+
+### 5.2 Install the environment
 
 ```bash
 conda create -n wm-craftnet python=3.8
@@ -148,7 +148,7 @@ pip install -e . --no-deps
 
 See [`install.md`](install.md) for additional notes.
 
-### 5.2 Quick test (simulation)
+### 5.3 Run a simulation test
 
 Download the released z-axis checkpoint and run the test script:
 
@@ -166,7 +166,9 @@ The script opens the viewer by default. Pass extra Hydra arguments after the scr
 
 ---
 
-## 6. fTraining
+## 6. Training
+
+### 6.1 Start a training run
 
 Each entry script selects the matching task config and accepts Hydra overrides:
 
@@ -181,7 +183,7 @@ bash scripts/train_wm_craftnet_x.sh task.env.objSet=set_x4
 bash scripts/train_wm_craftnet_y.sh task.env.objSet=set_y
 ```
 
-**Object sets**
+### 6.2 Choose an object set
 
 | Set | Objects | Task |
 | --- | --- | --- |
@@ -191,7 +193,7 @@ bash scripts/train_wm_craftnet_y.sh task.env.objSet=set_y
 
 Object meshes, robot assets, and datasets may have terms outside this repository. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) before redistribution.
 
-**Memory settings**
+### 6.3 Configure memory and devices
 
 The paper setup uses `num_envs=1024` and `minibatch_size=4096` ([`WMCraftnetPPO.yaml`](isaacgymenvs/cfg/train/WMCraftnetPPO.yaml)). Scripts default to `256` envs and a `1024` minibatch so the WSM replay buffer fits on a 32 GiB host:
 
@@ -208,7 +210,7 @@ NUM_ENVS=1024 MINIBATCH_SIZE=4096 bash scripts/train_wm_craftnet_y.sh
 
 Edit the device switches at the top of each script for simulation, RL, and graphics GPUs. Outputs go to `runs/`.
 
-### 6.1 WSM prediction heads
+### 6.4 Configure WSM prediction heads
 
 Six optional heads are enabled by default—proprioception, clean depth, object pose, tactile contact, critic value, and BPS object shape—plus reward prediction. Configure them under `task.env.cameraPolicy.worldModel` in [`WMCraftnetRotation.yaml`](isaacgymenvs/cfg/task/WMCraftnetRotation.yaml):
 
@@ -257,7 +259,7 @@ The released deployment targets a Sharpa Wave hand with an Intel RealSense D405 
 
 On real hardware, the wrist depth stream is noisy and incomplete. The WSM latent reconstructs a cleaner depth representation that preserves hand–object geometry—supporting the same policy at deployment time. More rollouts are on the [project website](https://wmcraftnet.github.io/#depth-reconstruction).
 
-### 7.1 Prepare the hardware
+### 7.1 Prepare the hardware and choose a camera mount
 
 The current mounting hardware uses an **Intel RealSense D405**. The **Intel RealSense L515** reported in the paper belongs to an earlier hardware revision and is not the camera modeled by the STEP files below.
 
@@ -299,18 +301,11 @@ rm -rf "$SDK_TMP" "$SDK_DEB"
 
 The non-CUDA build receives 30 Hz tactile inference from the hand. The optional CUDA SDK build requires CUDA 13.x and TensorRT 10.x.
 
-### 7.3 Configure inference
+### 7.3 Configure the checkpoint and inference runtime
 
-Download [`wm_craftnet_set_z.pth`](https://huggingface.co/SharpaIT/WM-Craftnet/blob/main/wm_craftnet_set_z.pth) into `example_ckpt/` beside [`wm_craftnet_set_z.yaml`](example_ckpt/wm_craftnet_set_z.yaml). In `build_hardcoded_config()` inside [`wm_craftnet_infer.py`](deploy/examples/wm_craftnet_infer.py), set the checkpoint path and camera options. For the first run, use `no_actuation=True` and a finite `max_steps`:
+Download [`wm_craftnet_set_z.pth`](https://huggingface.co/SharpaIT/WM-Craftnet/blob/main/wm_craftnet_set_z.pth) into `example_ckpt/` beside [`wm_craftnet_set_z.yaml`](example_ckpt/wm_craftnet_set_z.yaml). In `build_hardcoded_config()` inside [`wm_craftnet_infer.py`](deploy/examples/wm_craftnet_infer.py), set the checkpoint path and camera options. Set `no_actuation=True` and a finite `max_steps`, and keep actuation disabled until the calibration and dry-run checks below are complete.
 
-```bash
-conda activate inhand_deploy310
-python deploy/examples/wm_craftnet_infer.py
-```
-
-Keep actuation disabled until the calibration and safety checks below are complete.
-
-### 7.4 Calibrate and validate sim-to-real deployment
+### 7.4 Calibrate the sim-to-real setup
 
 The policy depends on the complete observation and control stack—not just the checkpoint. Match the real setup to training, then tune the simulation and domain-randomization ranges from measurements of the actual hardware.
 
@@ -327,7 +322,26 @@ The policy depends on the complete observation and control stack—not just the 
 > [!CAUTION]
 > A learned policy can command sudden, unexpected motion. Before sending any command, confirm the robot identity and network connection, test the emergency stop, enforce joint and torque limits, clear people and obstacles from the workspace, and begin at reduced speed under direct supervision.
 
-### 7.5 Run on Intel GPU (XPU)
+### 7.5 Validate before enabling actuation
+
+1. Mount the D405 and measure its pose relative to the hand; update the simulated camera extrinsics accordingly.
+2. Configure the RealSense stream. Runtime resizes depth to `96 × 72` before applying `depth_preprocess.crop`.
+3. Measure the real hand response, contact behavior, and depth artifacts; tune dynamics and depth-observation DR to cover the observed conditions.
+4. Compare real and simulated depth. Correct camera pose first, then crop and noise settings—do not change the policy input size.
+5. With `no_actuation=True`, start a finite dry run:
+
+   ```bash
+   conda activate inhand_deploy310
+   python deploy/examples/wm_craftnet_infer.py
+   ```
+
+   Inspect the depth preview, telemetry, inference latency, and control-loop overruns.
+6. Verify the emergency stop and motion limits, then enable actuation at reduced speed before increasing performance.
+
+> [!TIP]
+> **Control-rate tuning.** After validating end-to-end latency and hardware safety, training and deploying with a matched **20 Hz or 30 Hz** control loop can provide smoother motion than the released 10 Hz timing. Keep the checkpoint timing and real control loop synchronized.
+
+### 7.6 Optional: run inference on an Intel GPU (XPU)
 
 The deployment inference (WSM and policy) also runs on Intel GPUs, such as the Arc Pro B60, through PyTorch's XPU backend. In the deployment environment, install the XPU build of PyTorch instead of the CUDA build, then the packages the deploy scripts import:
 
@@ -338,24 +352,14 @@ python deploy/examples/wm_craftnet_infer.py
 ```
 
 `build_hardcoded_config()` picks the device by itself: CUDA first, then XPU, then the CPU. Set `device` there (for example `"xpu:0"`) to choose one. Simulation, training and evaluation use Isaac Gym, which needs an NVIDIA GPU, so they stay CUDA-only.
-#### Recommended validation sequence
-
-1. Mount the D405 and measure its pose relative to the hand; update the simulated camera extrinsics accordingly.
-2. Configure the RealSense stream. Runtime resizes depth to `96 × 72` before applying `depth_preprocess.crop`.
-3. Measure the real hand response, contact behavior, and depth artifacts; tune dynamics and depth-observation DR to cover the observed conditions.
-4. Compare real and simulated depth. Correct camera pose first, then crop and noise settings—do not change the policy input size.
-5. Run with `no_actuation=True`; inspect the depth preview, telemetry, inference latency, and control-loop overruns.
-6. Verify the emergency stop and motion limits, then enable actuation at reduced speed before increasing performance.
-
-> [!TIP]
-> **Control-rate tuning.** After validating end-to-end latency and hardware safety, training and deploying with a matched **20 Hz or 30 Hz** control loop can provide smoother motion than the released 10 Hz timing. Keep the checkpoint timing and real control loop synchronized.
-
-> [!NOTE]
-> **Follow-up work and planned open source.** For our latest work on dexterous reorientation, see [**TacBPM: A Tactile-conditioned Behavior Prior Model for Dexterous Reorientation**](https://arxiv.org/abs/2609.18174). Its code and associated resources will be open-sourced in a future release—please stay tuned.
 
 ---
 
-## 8. Acknowledgements
+## 8. Related Work
+
+For our latest work on dexterous reorientation, see [**TacBPM: A Tactile-conditioned Behavior Prior Model for Dexterous Reorientation**](https://arxiv.org/abs/2609.18174). Its code and associated resources will be open-sourced in a future release.
+
+## 9. Acknowledgements
 
 WM-Craftnet builds on:
 
@@ -367,7 +371,7 @@ WM-Craftnet builds on:
 
 See [`NOTICE`](NOTICE) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for license texts and attribution.
 
-## 9. Citation
+## 10. Citation
 
 ```bibtex
 @inproceedings{yin2026wmcraftnet,
@@ -378,6 +382,6 @@ See [`NOTICE`](NOTICE) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) fo
 }
 ```
 
-## License
+## 11. License
 
 Released under the [Apache License, Version 2.0](LICENSE). See [`NOTICE`](NOTICE) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for third-party attribution.
