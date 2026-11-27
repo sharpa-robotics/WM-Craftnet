@@ -667,10 +667,12 @@ class MLP(nn.Module):
         unimix_ratio=0.01,
         outscale=1.0,
         symlog_inputs=False,
-        device="cuda",
+        device=None,
         name="NoName",
     ):
         super(MLP, self).__init__()
+        if device is None:
+            device = tools.get_default_device()
         self._shape = (shape,) if isinstance(shape, int) else shape
         if self._shape is not None and len(self._shape) == 0:
             self._shape = (1,)

@@ -43,6 +43,15 @@ from torch import distributions as torchd
 to_np = lambda x: x.detach().cpu().numpy()
 
 
+def get_default_device():
+    """Return the default accelerator: CUDA, then Intel XPU, then the CPU."""
+    if torch.cuda.is_available():
+        return "cuda"
+    if hasattr(torch, "xpu") and torch.xpu.is_available():
+        return "xpu"
+    return "cpu"
+
+
 def symlog(x):
     return torch.sign(x) * torch.log(torch.abs(x) + 1.0)
 

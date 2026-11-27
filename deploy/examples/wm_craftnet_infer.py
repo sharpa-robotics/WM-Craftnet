@@ -118,6 +118,15 @@ _UPPER_BY_NAME = {n: v for n, v in zip(_OLD_LIMIT_ORDER, _OLD_DOF_UPPER)}
 DOF_LOWER = np.array([_LOWER_BY_NAME[name] for name in ISAAC_JOINT_NAMES], dtype=np.float32)
 DOF_UPPER = np.array([_UPPER_BY_NAME[name] for name in ISAAC_JOINT_NAMES], dtype=np.float32)
 
+def get_default_device() -> str:
+    """Return the inference device: CUDA, then Intel XPU, then the CPU."""
+    if torch.cuda.is_available():
+        return "cuda:0"
+    if hasattr(torch, "xpu") and torch.xpu.is_available():
+        return "xpu:0"
+    return "cpu"
+
+
 def sharpa_to_isaac(sharpa_angles: np.ndarray) -> np.ndarray:
     isaac = np.zeros_like(sharpa_angles, dtype=np.float32)
     for sharpa_i, isaac_i in enumerate(ISAACLAB2SHARPA_IDX):
@@ -1086,7 +1095,7 @@ def build_hardcoded_config() -> SimpleNamespace:
         "cam_fps": 30,
         "show_depth": True,
         "depth_view_scale": 6,
-        "device": "cuda:0",
+        "device": get_default_device(),
         "sn": "",
         "allow_glove": False,
         "discover_timeout": 10.0,

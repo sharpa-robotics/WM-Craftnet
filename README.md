@@ -36,7 +36,7 @@
   </a>
 </p>
 
-## Overview
+## 1. Overview
 
 WM-Craftnet learns a **World Synesthesia Model (WSM)** for dexterous in-hand rotation. It fuses proprioception, noisy wrist depth, tactile contact, and action history into an action-conditioned recurrent state that captures geometry, contact, motion, and slip. That state is passed directly to an asymmetric actor–critic policy as a deployable representation—without imagined rollouts.
 
@@ -44,7 +44,7 @@ The model also reconstructs clean depth from noisy observations, which improves 
 
 ![WM-Craftnet pipeline](docs/media/pipeline.webp)
 
-## Highlights
+## 2. Highlights
 
 | | |
 | --- | --- |
@@ -53,13 +53,13 @@ The model also reconstructs clean depth from noisy observations, which improves 
 | **Reusable physical prior** | A WSM pretrained on nine z-axis objects can initialize learning on other object sets. |
 | **Real-robot deployment** | Transfers to Sharpa Wave using deployable wrist depth and tactile sensors. |
 
-## Method
+## 3. Method
 
 1. **Encode** proprioception, wrist depth, tactile contact, and the previous action.
 2. **Predict** action-conditioned dynamics with a Dreamer-style recurrent state-space model, supervised by clean depth and reward.
 3. **Control** with the detached deterministic WSM state fed to the policy; reuse pretrained WSM weights for new object sets.
 
-## Demos
+## 4. Demos
 
 <table>
   <tr>
@@ -114,9 +114,9 @@ More real-robot, multi-axis, depth-reconstruction, and unseen-object rollouts ar
 
 ---
 
-## Getting Started
+## 5. Getting Started
 
-### Installation
+### 5.1 Installation
 
 **Requirements**
 
@@ -148,7 +148,7 @@ pip install -e . --no-deps
 
 See [`install.md`](install.md) for additional notes.
 
-### Quick test (simulation)
+### 5.2 Quick test (simulation)
 
 Download the released z-axis checkpoint and run the test script:
 
@@ -166,7 +166,7 @@ The script opens the viewer by default. Pass extra Hydra arguments after the scr
 
 ---
 
-## Training
+## 6. fTraining
 
 Each entry script selects the matching task config and accepts Hydra overrides:
 
@@ -208,7 +208,7 @@ NUM_ENVS=1024 MINIBATCH_SIZE=4096 bash scripts/train_wm_craftnet_y.sh
 
 Edit the device switches at the top of each script for simulation, RL, and graphics GPUs. Outputs go to `runs/`.
 
-### WSM prediction heads
+### 6.1 WSM prediction heads
 
 Six optional heads are enabled by default—proprioception, clean depth, object pose, tactile contact, critic value, and BPS object shape—plus reward prediction. Configure them under `task.env.cameraPolicy.worldModel` in [`WMCraftnetRotation.yaml`](isaacgymenvs/cfg/task/WMCraftnetRotation.yaml):
 
@@ -225,7 +225,7 @@ Checkpoint and head configs must match at train and test time. The released chec
 
 ---
 
-## Real-Robot Deployment
+## 7. Real-Robot Deployment
 
 The released deployment targets a Sharpa Wave hand with an Intel RealSense D405 wrist camera. Runtime examples are under [`deploy/`](deploy/), and the camera-mount CAD models are under [`assets/cad/wrist_camera_mount/`](assets/cad/wrist_camera_mount/). Use **Python 3.10** for deployment; simulation and training stay on **Python 3.8**.
 
@@ -257,7 +257,7 @@ The released deployment targets a Sharpa Wave hand with an Intel RealSense D405 
 
 On real hardware, the wrist depth stream is noisy and incomplete. The WSM latent reconstructs a cleaner depth representation that preserves hand–object geometry—supporting the same policy at deployment time. More rollouts are on the [project website](https://wmcraftnet.github.io/#depth-reconstruction).
 
-### 1. Prepare the hardware
+### 7.1 Prepare the hardware
 
 The current mounting hardware uses an **Intel RealSense D405**. The **Intel RealSense L515** reported in the paper belongs to an earlier hardware revision and is not the camera modeled by the STEP files below.
 
@@ -272,7 +272,7 @@ Two mount variants are provided for the alternative camera-to-hand-bracket inter
 
 Choose the model that matches your hand bracket. Before manufacturing or assembly, verify all interface dimensions, fastener clearances, camera field of view, and collision-free hand motion against your hardware revision.
 
-### 2. Install the Sharpa Wave SDK
+### 7.2 Install the Sharpa Wave SDK
 
 Download from the [Sharpa download page](https://www.sharpa.com/pages/downloads) or [GitHub releases](https://github.com/sharpa-robotics/sharpa-wave-sdk/releases). On x86-64 Ubuntu, run from the repository root to install the public non-CUDA SDK v5.0.9 under `deploy/sharpa_sdk/`:
 
@@ -299,7 +299,7 @@ rm -rf "$SDK_TMP" "$SDK_DEB"
 
 The non-CUDA build receives 30 Hz tactile inference from the hand. The optional CUDA SDK build requires CUDA 13.x and TensorRT 10.x.
 
-### 3. Configure inference
+### 7.3 Configure inference
 
 Download [`wm_craftnet_set_z.pth`](https://huggingface.co/SharpaIT/WM-Craftnet/blob/main/wm_craftnet_set_z.pth) into `example_ckpt/` beside [`wm_craftnet_set_z.yaml`](example_ckpt/wm_craftnet_set_z.yaml). In `build_hardcoded_config()` inside [`wm_craftnet_infer.py`](deploy/examples/wm_craftnet_infer.py), set the checkpoint path and camera options. For the first run, use `no_actuation=True` and a finite `max_steps`:
 
@@ -310,7 +310,7 @@ python deploy/examples/wm_craftnet_infer.py
 
 Keep actuation disabled until the calibration and safety checks below are complete.
 
-### 4. Calibrate and validate sim-to-real deployment
+### 7.4 Calibrate and validate sim-to-real deployment
 
 The policy depends on the complete observation and control stack—not just the checkpoint. Match the real setup to training, then tune the simulation and domain-randomization ranges from measurements of the actual hardware.
 
@@ -327,6 +327,17 @@ The policy depends on the complete observation and control stack—not just the 
 > [!CAUTION]
 > A learned policy can command sudden, unexpected motion. Before sending any command, confirm the robot identity and network connection, test the emergency stop, enforce joint and torque limits, clear people and obstacles from the workspace, and begin at reduced speed under direct supervision.
 
+### 7.5 Run on Intel GPU (XPU)
+
+The deployment inference (WSM and policy) also runs on Intel GPUs, such as the Arc Pro B60, through PyTorch's XPU backend. In the deployment environment, install the XPU build of PyTorch instead of the CUDA build, then the packages the deploy scripts import:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/xpu
+pip install gym numpy omegaconf hydra-core pyyaml pyrealsense2 pyzmq
+python deploy/examples/wm_craftnet_infer.py
+```
+
+`build_hardcoded_config()` picks the device by itself: CUDA first, then XPU, then the CPU. Set `device` there (for example `"xpu:0"`) to choose one. Simulation, training and evaluation use Isaac Gym, which needs an NVIDIA GPU, so they stay CUDA-only.
 #### Recommended validation sequence
 
 1. Mount the D405 and measure its pose relative to the hand; update the simulated camera extrinsics accordingly.
@@ -344,7 +355,7 @@ The policy depends on the complete observation and control stack—not just the 
 
 ---
 
-## Acknowledgements
+## 8. Acknowledgements
 
 WM-Craftnet builds on:
 
@@ -356,7 +367,7 @@ WM-Craftnet builds on:
 
 See [`NOTICE`](NOTICE) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for license texts and attribution.
 
-## Citation
+## 9. Citation
 
 ```bibtex
 @inproceedings{yin2026wmcraftnet,
